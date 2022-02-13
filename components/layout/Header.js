@@ -32,7 +32,7 @@ export default function Header() {
           <div className="">
             <div className={styles.title}>
               <Icon icon={<Logo />} size="large" className={styles.logo} />
-              <Link href={user ? '/' : 'https://umami.is'}>umami</Link>
+              <Link href={user ? '/' : 'https://hashnode.com'}>hashnode</Link>
             </div>
           </div>
           <Button

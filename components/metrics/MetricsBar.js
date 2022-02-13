@@ -44,7 +44,7 @@ export default function MetricsBar({ websiteId, className }) {
   }
 
   const { pageviews, uniques, bounces, totaltime } = data || {};
-  const num = Math.min(data && uniques.value, data && bounces.value);
+  //const num = Math.min(data && uniques.value, data && bounces.value);
   const diffs = data && {
     pageviews: pageviews.value - pageviews.change,
     uniques: uniques.value - uniques.change,
@@ -70,7 +70,7 @@ export default function MetricsBar({ websiteId, className }) {
             change={uniques.change}
             format={formatFunc}
           />
-          <MetricCard
+          {/* <MetricCard
             label={<FormattedMessage id="metrics.bounce-rate" defaultMessage="Bounce rate" />}
             value={uniques.value ? (num / uniques.value) * 100 : 0}
             change={
@@ -81,7 +81,7 @@ export default function MetricsBar({ websiteId, className }) {
             }
             format={n => Number(n).toFixed(0) + '%'}
             reverseColors
-          />
+          /> */}
           <MetricCard
             label={
               <FormattedMessage

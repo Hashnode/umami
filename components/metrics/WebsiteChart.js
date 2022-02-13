@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import PageviewsChart from './PageviewsChart';
 import MetricsBar from './MetricsBar';
-import WebsiteHeader from './WebsiteHeader';
+//import WebsiteHeader from './WebsiteHeader';
 import DateFilter from 'components/common/DateFilter';
 import StickyHeader from 'components/helpers/StickyHeader';
 import useFetch from 'hooks/useFetch';
@@ -18,10 +18,10 @@ import styles from './WebsiteChart.module.css';
 
 export default function WebsiteChart({
   websiteId,
-  title,
-  domain,
+  //title,
+  //domain,
   stickyHeader = false,
-  showLink = false,
+  //showLink = false,
   hideChart = false,
   onDataLoad = () => {},
 }) {
@@ -68,7 +68,7 @@ export default function WebsiteChart({
 
   return (
     <div className={styles.container}>
-      <WebsiteHeader websiteId={websiteId} title={title} domain={domain} showLink={showLink} />
+      {/* <WebsiteHeader websiteId={websiteId} title={title} domain={domain} showLink={showLink} /> */}
       <div className={classNames(styles.header, 'row')}>
         <StickyHeader
           className={classNames(styles.metrics, 'col row')}
