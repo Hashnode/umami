@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 import Link from 'components/common/Link';
 import Icon from 'components/common/Icon';
-import LanguageButton from 'components/settings/LanguageButton';
+//import LanguageButton from 'components/settings/LanguageButton';
 import ThemeButton from 'components/settings/ThemeButton';
 import UpdateNotice from 'components/common/UpdateNotice';
 import UserButton from 'components/settings/UserButton';
@@ -59,7 +59,7 @@ export default function Header() {
             <div className={active ? classNames(styles.active) : ''}>
               <div className={styles.buttons}>
                 <ThemeButton />
-                <LanguageButton menuAlign="right" />
+                {/* <LanguageButton menuAlign="right" /> */}
                 {user && <UserButton />}
               </div>
             </div>
