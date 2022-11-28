@@ -10,6 +10,9 @@ module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    domains: ['cdn.hashnode.com'],
+  },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,

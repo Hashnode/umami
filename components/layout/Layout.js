@@ -4,16 +4,19 @@ import Header from 'components/layout/Header';
 import Footer from 'components/layout/Footer';
 import useLocale from 'hooks/useLocale';
 
-export default function Layout({ title, children, header = true, footer = true }) {
+export default function Layout({ children, header = true, footer = true, publication }) {
   const { dir } = useLocale();
+  const publicationTitle = `${
+    publication.displayTitle || publication.title || publication.username
+  } + Analytics`;
 
   return (
     <>
       <Head>
-        <title>Hashnode{title && ` - ${title}`}</title>
+        <title>{publicationTitle}</title>
       </Head>
 
-      {header && <Header />}
+      {header && <Header publication={publication} />}
       <main className="container" dir={dir}>
         {children}
       </main>

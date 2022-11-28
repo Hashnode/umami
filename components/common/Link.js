@@ -5,11 +5,11 @@ import NextLink from 'next/link';
 import Icon from './Icon';
 import styles from './Link.module.css';
 
-function Link({ className, icon, children, size, iconRight, ...props }) {
+function Link({ className, icon, children, size, iconRight, noDefaultLinkStyles, ...props }) {
   return (
     <NextLink {...props}>
       <a
-        className={classNames(styles.link, className, {
+        className={classNames(noDefaultLinkStyles ? '' : styles.link, className, {
           [styles.large]: size === 'large',
           [styles.small]: size === 'small',
           [styles.xsmall]: size === 'xsmall',
@@ -29,6 +29,7 @@ Link.propTypes = {
   children: PropTypes.node,
   size: PropTypes.oneOf(['large', 'small', 'xsmall']),
   iconRight: PropTypes.bool,
+  noDefaultLinkStyles: PropTypes.bool,
 };
 
 export default Link;
