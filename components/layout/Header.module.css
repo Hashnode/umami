@@ -25,45 +25,6 @@
 
 .logo {
   width: 100%;
-  display: block;
-}
-
-.logoLink,
-.logoLink:active,
-.logoLink:visited {
-  width: 224px;
-}
-
-.defaultLogoLink,
-.defaultLogoLink:active,
-.defaultLogoLink:visited {
-  color: var(--gray900);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  text-align: center;
-  overflow-wrap: break-word;
-  padding: 1rem;
-}
-
-.profilePhoto {
-  width: 2.5rem;
-  height: 2.5rem;
-  margin-right: 0.5rem;
-  overflow: hidden;
-  border-radius: 9999px;
-}
-
-@media only screen and (max-width: 768px) {
-  .profilePhoto {
-    display: none;
-  }
-}
-
-@media only screen and (min-width: 768px) {
-  .logoLink {
-    width: 256px;
-  }
 }
 
 .nav {

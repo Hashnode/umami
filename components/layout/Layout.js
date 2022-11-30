@@ -6,9 +6,11 @@ import useLocale from 'hooks/useLocale';
 
 export default function Layout({ children, header = true, footer = true, publication }) {
   const { dir } = useLocale();
-  const publicationTitle = `${
-    publication.displayTitle || publication.title || publication.username
-  } + Analytics`;
+  const publicationTitle = publication
+    ? `${
+        publication.displayTitle || publication.title || `${publication.author?.name}'s Blog`
+      } + Analytics`
+    : 'Hashnode';
 
   return (
     <>

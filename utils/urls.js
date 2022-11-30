@@ -11,7 +11,7 @@ const publicationDomainNames = {
   production: 'hashnode.dev',
 };
 
-const getAppUrl = () => {
+export const getAppUrl = () => {
   const NEXT_PUBLIC_HASHNODE_ENV = process.env.NEXT_PUBLIC_HASHNODE_ENV;
   let url;
 
