@@ -5,13 +5,11 @@ import useTheme from 'hooks/useTheme';
 import styles from './BlogLogo.module.css';
 
 import { resizeImage, getBlurHash } from 'utils/image';
-import { createPublicationOrigin } from 'utils/urls';
 
 export default function BlogLogo(props) {
   const { publication } = props;
   const [theme] = useTheme();
   const isThemeDark = theme === 'dark';
-  const blogURL = createPublicationOrigin(publication);
 
   if (!publication) {
     return null;
@@ -21,7 +19,7 @@ export default function BlogLogo(props) {
     <div>
       {publication.darkModeLogo && isThemeDark ? (
         <div className={styles.title}>
-          <Link className={styles.link} noDefaultLinkStyles href={blogURL}>
+          <Link className={styles.link} noDefaultLinkStyles href={publication.url}>
             <Image
               priority
               src={resizeImage(publication.darkModeLogo, { w: 1000, h: 250, c: 'thumb' })}
@@ -33,7 +31,7 @@ export default function BlogLogo(props) {
         </div>
       ) : publication.logo ? (
         <div className={styles.title}>
-          <Link className={styles.link} noDefaultLinkStyles href={blogURL}>
+          <Link className={styles.link} noDefaultLinkStyles href={publication.url}>
             <Image
               priority
               src={resizeImage(publication.logo, { w: 1000, h: 250, c: 'thumb' })}
@@ -45,7 +43,7 @@ export default function BlogLogo(props) {
         </div>
       ) : (
         <div className={styles.title}>
-          <Link className={styles.default} href={blogURL} noDefaultLinkStyles>
+          <Link className={styles.default} href={publication.url} noDefaultLinkStyles>
             {!publication.isTeam && publication.author.photo && (
               <div className={styles.photo}>
                 <Image
