@@ -16,7 +16,6 @@ async function getPublicationDetails(umamiShareId) {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
     });
     const json = await response.json();
     return json.publication;

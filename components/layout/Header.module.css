@@ -23,10 +23,6 @@
   line-height: 1.4;
 }
 
-.logo {
-  width: 100%;
-}
-
 .nav {
   display: flex;
   align-items: center;
@@ -72,7 +68,6 @@
 
   .title {
     padding: 0.5rem;
-    /* margin-bottom: 0.5rem; */
   }
 
   .nav {

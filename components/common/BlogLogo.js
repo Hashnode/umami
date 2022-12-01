@@ -24,7 +24,6 @@ export default function BlogLogo(props) {
           <Link className={styles.link} noDefaultLinkStyles href={blogURL}>
             <Image
               priority
-              className={styles.logo}
               src={resizeImage(publication.darkModeLogo, { w: 1000, h: 250, c: 'thumb' })}
               width={1000}
               height={250}
@@ -37,7 +36,6 @@ export default function BlogLogo(props) {
           <Link className={styles.link} noDefaultLinkStyles href={blogURL}>
             <Image
               priority
-              className={styles.logo}
               src={resizeImage(publication.logo, { w: 1000, h: 250, c: 'thumb' })}
               width={1000}
               height={250}

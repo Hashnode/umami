@@ -38,7 +38,7 @@ export default function Header(props) {
           />
           {!publication ? (
             <div className={styles.title}>
-              <Icon icon={<Logo />} size="large" className={styles.logo} />
+              <Icon icon={<Logo />} size="large" />
               <Link href={user ? '/' : 'https://hashnode.com'}>hashnode</Link>
             </div>
           ) : (
