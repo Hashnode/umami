@@ -25,7 +25,7 @@ export default function BlogLogo(props) {
               src={resizeImage(publication.darkModeLogo, { w: 1000, h: 250, c: 'thumb' })}
               width={1000}
               height={250}
-              alt={publication.title || `${publication.author.name}'s Blog`}
+              alt={publication.title || `${publication.author?.name}'s Blog`}
             />
           </Link>
         </div>
@@ -37,28 +37,28 @@ export default function BlogLogo(props) {
               src={resizeImage(publication.logo, { w: 1000, h: 250, c: 'thumb' })}
               width={1000}
               height={250}
-              alt={publication.title || `${publication.author.name}'s Blog`}
+              alt={publication.title || `${publication.author?.name}'s Blog`}
             />
           </Link>
         </div>
       ) : (
         <div className={styles.title}>
           <Link className={styles.default} href={publication.url} noDefaultLinkStyles>
-            {!publication.isTeam && publication.author.photo && (
+            {!publication.isTeam && publication.author?.photo && (
               <div className={styles.photo}>
                 <Image
                   priority
-                  src={resizeImage(publication.author.photo, { w: 400, h: 400, c: 'face' })}
+                  src={resizeImage(publication.author?.photo, { w: 400, h: 400, c: 'face' })}
                   blurDataURL={getBlurHash(
-                    resizeImage(publication.author.photo, { w: 400, h: 400, c: 'face' }),
+                    resizeImage(publication.author?.photo, { w: 400, h: 400, c: 'face' }),
                   )}
                   width={400}
                   height={400}
-                  alt={publication.author.name}
+                  alt={publication.author?.name}
                 />
               </div>
             )}
-            {publication.title || `${publication.author.name}'s Blog`}
+            {publication.title || `${publication.author?.name}'s Blog`}
           </Link>
         </div>
       )}

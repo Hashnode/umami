@@ -57,9 +57,7 @@ export const getServerSideProps = async ctx => {
 
   if (!publication) {
     return {
-      props: {
-        publication: {},
-      },
+      props: {},
     };
   }
   const pubUrl = createPublicationOrigin(publication);
@@ -76,7 +74,7 @@ export const getServerSideProps = async ctx => {
     ? `${
         publication.displayTitle || publication.title || `${publication.author?.name}'s Blog`
       } + Analytics`
-    : 'Hashnode';
+    : null;
 
   const descriptionSEO =
     publication.description ||
