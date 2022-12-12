@@ -50,14 +50,16 @@ export const getServerSideProps = async ctx => {
 
   if (!umamiShareId) {
     return {
-      props: {},
+      props: {
+        notFound: true,
+      },
     };
   }
   const publication = await getPublicationDetails(umamiShareId);
 
   if (!publication) {
     return {
-      props: {},
+      notFound: true,
     };
   }
   const pubUrl = createPublicationOrigin(publication);
