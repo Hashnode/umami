@@ -75,7 +75,7 @@ export const getServerSideProps = async ctx => {
   const publicationTitle = publication
     ? `${
         publication.displayTitle || publication.title || `${publication.author?.name}'s Blog`
-      } + Analytics`
+      } Analytics`
     : null;
 
   const descriptionSEO =
