@@ -1,4 +1,4 @@
-import punycode from 'punycode/';
+import { toUnicode } from 'punycode/';
 import { Base64 } from 'js-base64';
 
 const hashnodeEnv = process.env.NEXT_PUBLIC_HASHNODE_ENV;
@@ -16,7 +16,7 @@ const publicationDomainNames = {
 
 export function getHostNameFromUrl(url) {
   const { hostname } = new URL(url);
-  return punycode.toUnicode(hostname);
+  return toUnicode(hostname);
 }
 
 const stripEmojis = str =>
