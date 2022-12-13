@@ -1,0 +1,44 @@
+.title {
+  font-size: var(--font-size-large);
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+}
+
+.link,
+.link:active,
+.link:visited {
+  width: 224px;
+}
+
+.default,
+.default:active,
+.default:visited {
+  color: var(--gray900);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  overflow-wrap: break-word;
+  padding: 1rem;
+}
+
+.photo {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: 0.5rem;
+  overflow: hidden;
+  border-radius: 9999px;
+}
+
+@media only screen and (max-width: 768px) {
+  .photo {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .link {
+    width: 256px;
+  }
+}
