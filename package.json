@@ -103,6 +103,7 @@
     "@rollup/plugin-node-resolve": "^11.2.1",
     "@rollup/plugin-replace": "^2.3.4",
     "@svgr/webpack": "^5.5.0",
+    "@types/punycode": "^2.1.0",
     "cross-env": "^7.0.3",
     "del": "^6.0.0",
     "dotenv-cli": "^4.0.0",
