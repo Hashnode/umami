@@ -10,12 +10,9 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import FilterTags from 'components/metrics/FilterTags';
 import useFetch from 'hooks/useFetch';
 import useDateRange from 'hooks/useDateRange';
-import useTimezone from 'hooks/useTimezone';
 import usePageQuery from 'hooks/usePageQuery';
 import useLocale from 'hooks/useLocale';
 import { getDateArray, getDateLength, getDateRange, getDateRangeValues } from 'lib/date';
-import useShareToken from 'hooks/useShareToken';
-import { TOKEN_HEADER } from 'lib/constants';
 import { get } from 'lib/web';
 import styles from './WebsiteChart.module.css';
 
@@ -28,11 +25,9 @@ export default function WebsiteChart({
   showChart = true,
   onDataLoad = () => {},
 }) {
-  const shareToken = useShareToken();
   const [dateRange, setDateRange] = useDateRange(websiteId);
   const { startDate, endDate, unit, value, modified } = dateRange;
   const { locale } = useLocale();
-  const [timezone] = useTimezone();
   const { basePath } = useRouter();
   const {
     router,
@@ -41,18 +36,13 @@ export default function WebsiteChart({
   } = usePageQuery();
 
   const { data, loading, error } = useFetch(
-    `/api/website/${websiteId}/pageviews`,
+    `/api/gql/${domain}/pageviews`,
     {
       params: {
         start_at: +startDate,
         end_at: +endDate,
-        unit,
-        tz: timezone,
-        url,
-        ref,
       },
       onDataLoad,
-      headers: { [TOKEN_HEADER]: shareToken?.token },
     },
     [modified, url, ref],
   );
@@ -73,7 +63,7 @@ export default function WebsiteChart({
 
   async function handleDateChange(value) {
     if (value === 'all') {
-      const { data, ok } = await get(`${basePath}/api/website/${websiteId}`);
+      const { data, ok } = await get(`${basePath}/api/gql/${domain}`);
       if (ok) {
         setDateRange({ value, ...getDateRangeValues(new Date(data.created_at), Date.now()) });
       }
@@ -93,7 +83,7 @@ export default function WebsiteChart({
         >
           <FilterTags params={{ url, ref }} onClick={handleCloseFilter} />
           <div className="col-12 col-lg-9">
-            <MetricsBar websiteId={websiteId} />
+            <MetricsBar websiteId={websiteId} domain={domain} />
           </div>
           <div className={classNames(styles.filter, 'col-12 col-lg-3')}>
             <DateFilter

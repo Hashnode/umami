@@ -12,7 +12,7 @@ import { TOKEN_HEADER } from 'lib/constants';
 import MetricCard from './MetricCard';
 import styles from './MetricsBar.module.css';
 
-export default function MetricsBar({ websiteId, className }) {
+export default function MetricsBar({ websiteId, className, domain }) {
   const shareToken = useShareToken();
   const [dateRange] = useDateRange(websiteId);
   const { startDate, endDate, modified } = dateRange;
@@ -35,6 +35,13 @@ export default function MetricsBar({ websiteId, className }) {
     [modified, url, ref],
   );
 
+  const { data: dataGQL } = useFetch(`/api/gql/${domain}/stats`, {
+    params: {
+      start_at: +startDate,
+      end_at: +endDate,
+    },
+  });
+
   const formatFunc = format
     ? n => (n >= 0 ? formatLongNumber(n) : `-${formatLongNumber(Math.abs(n))}`)
     : formatNumber;
@@ -44,13 +51,16 @@ export default function MetricsBar({ websiteId, className }) {
   }
 
   const { pageviews, uniques, bounces, totaltime } = data || {};
-  const num = Math.min(data && uniques.value, data && bounces.value);
   const diffs = data && {
     pageviews: pageviews.value - pageviews.change,
     uniques: uniques.value - uniques.change,
     bounces: bounces.value - bounces.change,
     totaltime: totaltime.value - totaltime.change,
   };
+  const views = dataGQL?.data?.publication?.analytics?.views?.edges[0]?.node;
+  const pastViews = dataGQL?.data?.publication?.analytics?.pastViews?.edges[0]?.node;
+  const visitors = dataGQL?.data?.publication?.analytics?.visitors?.edges[0]?.node;
+  const pastVisitors = dataGQL?.data?.publication?.analytics?.pastVisitors?.edges[0]?.node;
 
   return (
     <div className={classNames(styles.bar, className)} onClick={handleSetFormat}>
@@ -60,17 +70,17 @@ export default function MetricsBar({ websiteId, className }) {
         <>
           <MetricCard
             label={<FormattedMessage id="metrics.views" defaultMessage="Views" />}
-            value={pageviews.value}
-            change={pageviews.change}
+            value={views?.total || 0}
+            change={Math.abs(views?.total || 0 - (pastViews?.total || 0))}
             format={formatFunc}
           />
           <MetricCard
             label={<FormattedMessage id="metrics.visitors" defaultMessage="Visitors" />}
-            value={uniques.value}
-            change={uniques.change}
+            value={visitors?.total || 0}
+            change={Math.abs(visitors?.total || 0 - (pastVisitors?.total || 0))}
             format={formatFunc}
           />
-          <MetricCard
+          {/* <MetricCard
             label={<FormattedMessage id="metrics.bounce-rate" defaultMessage="Bounce rate" />}
             value={uniques.value ? (num / uniques.value) * 100 : 0}
             change={
@@ -81,7 +91,7 @@ export default function MetricsBar({ websiteId, className }) {
             }
             format={n => Number(n).toFixed(0) + '%'}
             reverseColors
-          />
+          /> */}
           <MetricCard
             label={
               <FormattedMessage

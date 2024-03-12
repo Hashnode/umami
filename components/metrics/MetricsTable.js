@@ -6,17 +6,16 @@ import Link from 'components/common/Link';
 import Loading from 'components/common/Loading';
 import useFetch from 'hooks/useFetch';
 import Arrow from 'assets/arrow-right.svg';
-import { percentFilter } from 'lib/filters';
 import useDateRange from 'hooks/useDateRange';
 import usePageQuery from 'hooks/usePageQuery';
-import useShareToken from 'hooks/useShareToken';
 import ErrorMessage from 'components/common/ErrorMessage';
 import DataTable from './DataTable';
-import { DEFAULT_ANIMATION_DURATION, TOKEN_HEADER } from 'lib/constants';
+import { DEFAULT_ANIMATION_DURATION } from 'lib/constants';
 import styles from './MetricsTable.module.css';
 
 export default function MetricsTable({
   websiteId,
+  websiteDomain,
   type,
   className,
   dataFilter,
@@ -25,34 +24,31 @@ export default function MetricsTable({
   onDataLoad,
   ...props
 }) {
-  const shareToken = useShareToken();
   const [dateRange] = useDateRange(websiteId);
   const { startDate, endDate, modified } = dateRange;
   const {
     resolve,
     router,
-    query: { url },
   } = usePageQuery();
 
   const { data, loading, error } = useFetch(
-    `/api/website/${websiteId}/metrics`,
+    `/api/gql/${websiteDomain}/metrics`,
     {
       params: {
         type,
         start_at: +startDate,
         end_at: +endDate,
-        url,
+        limit
       },
       onDataLoad,
       delay: DEFAULT_ANIMATION_DURATION,
-      headers: { [TOKEN_HEADER]: shareToken?.token },
     },
     [modified],
   );
 
   const filteredData = useMemo(() => {
     if (data) {
-      const items = percentFilter(dataFilter ? dataFilter(data, filterOptions) : data);
+      const items = data;
       if (limit) {
         return items.filter((e, i) => i < limit).sort(firstBy('y', -1).thenBy('x'));
       }

@@ -9,7 +9,6 @@ export default function SharePage() {
   const { id } = router.query;
   const shareId = id?.[0];
   const shareToken = useShareToken(shareId);
-
   if (!shareToken) {
     return null;
   }

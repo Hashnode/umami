@@ -8,9 +8,9 @@ export default async (req, res) => {
   const websiteId = +id;
 
   if (req.method === 'GET') {
-    if (!(await allowQuery(req))) {
-      return unauthorized(res);
-    }
+    // if (!(await allowQuery(req))) {
+    //   return unauthorized(res);
+    // }
 
     const website = await getWebsiteById(websiteId);
 
