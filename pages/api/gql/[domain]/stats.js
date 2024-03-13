@@ -6,7 +6,12 @@ import { ok } from 'lib/response';
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
   const { start_at, end_at, domain } = req.query;
-  const data = await getAnalyticsData({ token: jwtToken, domain, startDate: start_at, endDate: end_at });
+  const data = await getAnalyticsData({
+    token: jwtToken,
+    domain,
+    startDate: start_at,
+    endDate: end_at,
+  });
   return ok(res, data);
 };
 
@@ -65,6 +70,22 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
               },
             },
           },
+          averageVisitTimeFilter: {
+            time: {
+              absolute: {
+                from: '2024-01-11T06:02:24.278Z',
+                to: '2024-02-12T06:02:24.278Z',
+              },
+            },
+          },
+          pastAverageVisitTimeFilter: {
+            time: {
+              absolute: {
+                from: '2024-02-11T06:02:24.278Z',
+                to: '2024-03-12T06:02:24.278Z',
+              },
+            },
+          },
         },
       }),
     });
@@ -76,50 +97,64 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
 }
 
 const query = `
-query Query($host: String, $first: Int!, $filter: PublicationViewsFilter, $pastFilter: PublicationViewsFilter,  $visitorsFilter: PublicationVisitorsFilter, $visitorsPastFilter: PublicationVisitorsFilter) {
-  publication(host: $host) {
-    url
-    analytics {
-      views(first: $first, filter: $filter) {
-        edges {
-          node {
-            id
-            from
-            to
-            total
+  query Query(
+    $host: String
+    $first: Int!
+    $filter: PublicationViewsFilter
+    $pastFilter: PublicationViewsFilter
+    $visitorsFilter: PublicationVisitorsFilter
+    $visitorsPastFilter: PublicationVisitorsFilter
+    $averageVisitTimeFilter: AverageVisitTimeFilter
+    $pastAverageVisitTimeFilter: AverageVisitTimeFilter
+  ) {
+    publication(host: $host) {
+      url
+      analytics {
+        views(first: $first, filter: $filter) {
+          edges {
+            node {
+              id
+              from
+              to
+              total
+            }
           }
         }
-      }
-      pastViews: views(first: $first, filter: $pastFilter) {
-        edges {
-          node {
-            id
-            from
-            to
-            total
+        pastViews: views(first: $first, filter: $pastFilter) {
+          edges {
+            node {
+              id
+              from
+              to
+              total
+            }
           }
         }
-      }
-      visitors(first: $first, filter: $visitorsFilter) {
-        edges {
-          node {
-            id
-            from
-            to
-            total
+        visitors(first: $first, filter: $visitorsFilter) {
+          edges {
+            node {
+              id
+              from
+              to
+              total
+            }
           }
         }
-      }
-      pastVisitors: visitors(first: $first, filter: $visitorsPastFilter) {
-        edges {
-          node {
-            id
-            from
-            to
-            total
+        pastVisitors: visitors(first: $first, filter: $visitorsPastFilter) {
+          edges {
+            node {
+              id
+              from
+              to
+              total
+            }
           }
         }
+        averageVisitTimeInSeconds(filter: $averageVisitTimeFilter)
+        pastAverageVisitTimeInSeconds: averageVisitTimeInSeconds(
+          filter: $pastAverageVisitTimeFilter
+        )
       }
     }
   }
-}`;
+`;
