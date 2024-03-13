@@ -61,6 +61,10 @@ export default function MetricsBar({ websiteId, className, domain }) {
   const pastViews = dataGQL?.data?.publication?.analytics?.pastViews?.edges[0]?.node;
   const visitors = dataGQL?.data?.publication?.analytics?.visitors?.edges[0]?.node;
   const pastVisitors = dataGQL?.data?.publication?.analytics?.pastVisitors?.edges[0]?.node;
+  const averageVisitTimeInSeconds =
+    dataGQL?.data?.publication?.analytics?.averageVisitTimeInSeconds;
+  const pastAverageVisitTimeInSeconds =
+    dataGQL?.data?.publication?.analytics?.pastAverageVisitTimeInSeconds;
 
   return (
     <div className={classNames(styles.bar, className)} onClick={handleSetFormat}>
@@ -71,13 +75,13 @@ export default function MetricsBar({ websiteId, className, domain }) {
           <MetricCard
             label={<FormattedMessage id="metrics.views" defaultMessage="Views" />}
             value={views?.total || 0}
-            change={Math.abs(views?.total || 0 - (pastViews?.total || 0))}
+            change={views?.total || 0 - (pastViews?.total || 0)}
             format={formatFunc}
           />
           <MetricCard
             label={<FormattedMessage id="metrics.visitors" defaultMessage="Visitors" />}
             value={visitors?.total || 0}
-            change={Math.abs(visitors?.total || 0 - (pastVisitors?.total || 0))}
+            change={visitors?.total || 0 - (pastVisitors?.total || 0)}
             format={formatFunc}
           />
           {/* <MetricCard
@@ -99,18 +103,8 @@ export default function MetricsBar({ websiteId, className, domain }) {
                 defaultMessage="Average visit time"
               />
             }
-            value={
-              totaltime.value && pageviews.value
-                ? totaltime.value / (pageviews.value - bounces.value)
-                : 0
-            }
-            change={
-              totaltime.value && pageviews.value
-                ? (diffs.totaltime / (diffs.pageviews - diffs.bounces) -
-                    totaltime.value / (pageviews.value - bounces.value)) *
-                    -1 || 0
-                : 0
-            }
+            value={averageVisitTimeInSeconds}
+            change={averageVisitTimeInSeconds - pastAverageVisitTimeInSeconds}
             format={n => `${n < 0 ? '-' : ''}${formatShortTime(Math.abs(~~n), ['m', 's'], ' ')}`}
           />
         </>
