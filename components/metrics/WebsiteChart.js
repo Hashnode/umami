@@ -27,6 +27,7 @@ export default function WebsiteChart({
 }) {
   const [dateRange, setDateRange] = useDateRange(websiteId);
   const { startDate, endDate, unit, value, modified } = dateRange;
+  console.log(`unit, value`, unit, value); // TODO: remove this
   const { locale } = useLocale();
   const { basePath } = useRouter();
   const {
@@ -41,6 +42,8 @@ export default function WebsiteChart({
       params: {
         start_at: +startDate,
         end_at: +endDate,
+        groupByUnit: unit,
+        groupByValue: value,
       },
       onDataLoad,
     },

@@ -66,13 +66,9 @@ query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
         edges {
           node {
             id
-            from
-            to
             total
             ... on GroupedByDeviceTypeViews {
               id
-              from
-              to
               total
               deviceType
             }
@@ -85,13 +81,9 @@ query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
         edges {
           node {
             id
-            from
-            to
             total
             ... on GroupedByBrowserViews {
               id
-              from
-              to
               total
               browser
             }
@@ -109,8 +101,6 @@ query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
             total
             ... on GroupedByOperatingSystemViews {
               id
-              from
-              to
               total
               operatingSystem
             }
@@ -128,11 +118,8 @@ query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
             total
             ... on GroupedByCountryViews {
               id
-              from
-              to
               total
-              country
-            }
+              country            }
           }
         }
       }
@@ -147,8 +134,6 @@ query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
             total
             ... on GroupedByReferrerHostViews {
               id
-              from
-              to
               total
               referrerHost
             }
@@ -161,13 +146,9 @@ query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
         edges {
           node {
             id
-            from
-            to
             total
             ... on GroupedByPageViews {
               id
-              from
-              to
               total
               page {
                 id
