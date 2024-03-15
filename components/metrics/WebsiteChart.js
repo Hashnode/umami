@@ -7,28 +7,23 @@ import DateFilter from 'components/common/DateFilter';
 import StickyHeader from 'components/helpers/StickyHeader';
 import useFetch from 'hooks/useFetch';
 import useDateRange from 'hooks/useDateRange';
-import useTimezone from 'hooks/useTimezone';
 import usePageQuery from 'hooks/usePageQuery';
-import { getDateArray, getDateLength } from 'lib/date';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FilterTags from 'components/metrics/FilterTags';
-import useShareToken from 'hooks/useShareToken';
-import { TOKEN_HEADER } from 'lib/constants';
+import { getDateArray, getDateLength } from 'lib/date';
 import styles from './WebsiteChart.module.css';
 
 export default function WebsiteChart({
   websiteId,
   //title,
-  //domain,
+  domain,
   stickyHeader = false,
   //showLink = false,
   hideChart = false,
   onDataLoad = () => {},
 }) {
-  const shareToken = useShareToken();
   const [dateRange, setDateRange] = useDateRange(websiteId);
   const { startDate, endDate, unit, value, modified } = dateRange;
-  const [timezone] = useTimezone();
   const {
     router,
     resolve,
@@ -36,18 +31,13 @@ export default function WebsiteChart({
   } = usePageQuery();
 
   const { data, loading, error } = useFetch(
-    `/api/website/${websiteId}/pageviews`,
+    `/api/gql/${domain}/pageviews`,
     {
       params: {
         start_at: +startDate,
         end_at: +endDate,
-        unit,
-        tz: timezone,
-        url,
-        ref,
       },
       onDataLoad,
-      headers: { [TOKEN_HEADER]: shareToken?.token },
     },
     [modified, url, ref],
   );
@@ -77,7 +67,7 @@ export default function WebsiteChart({
         >
           <FilterTags params={{ url, ref }} onClick={handleCloseFilter} />
           <div className="col-12 col-lg-9">
-            <MetricsBar websiteId={websiteId} />
+            <MetricsBar websiteId={websiteId} domain={domain} />
           </div>
           <div className={classNames(styles.filter, 'col-12 col-lg-3')}>
             <DateFilter

@@ -5,7 +5,7 @@ import WebsiteChart from 'components/metrics/WebsiteChart';
 import WorldMap from 'components/common/WorldMap';
 import Page from 'components/layout/Page';
 import GridLayout, { GridRow, GridColumn } from 'components/layout/GridLayout';
-import MenuLayout from 'components/layout/MenuLayout';
+// import MenuLayout from 'components/layout/MenuLayout';
 import Link from 'components/common/Link';
 import Loading from 'components/common/Loading';
 import Arrow from 'assets/arrow-right.svg';
@@ -16,8 +16,6 @@ import BrowsersTable from '../metrics/BrowsersTable';
 import OSTable from '../metrics/OSTable';
 import DevicesTable from '../metrics/DevicesTable';
 import CountriesTable from '../metrics/CountriesTable';
-import EventsTable from '../metrics/EventsTable';
-import EventsChart from '../metrics/EventsChart';
 import useFetch from 'hooks/useFetch';
 import usePageQuery from 'hooks/usePageQuery';
 import useShareToken from 'hooks/useShareToken';
@@ -30,7 +28,6 @@ const views = {
   os: OSTable,
   device: DevicesTable,
   country: CountriesTable,
-  event: EventsTable,
 };
 
 export default function WebsiteDetails({ websiteId }) {
@@ -38,9 +35,20 @@ export default function WebsiteDetails({ websiteId }) {
   const { data } = useFetch(`/api/website/${websiteId}`, {
     headers: { [TOKEN_HEADER]: shareToken?.token },
   });
+
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <MainContent data={data} websiteId={websiteId} />
+  );
+}
+
+function MainContent({ data, websiteId }) {
+  const { data: dataGQL } = useFetch(`/api/gql/${data.domain}/pageviews`, {}, []);
   const [chartLoaded, setChartLoaded] = useState(false);
   const [countryData, setCountryData] = useState();
-  const [eventsData, setEventsData] = useState();
   const {
     resolve,
     query: { view },
@@ -102,7 +110,7 @@ export default function WebsiteDetails({ websiteId }) {
     }
   }
 
-  if (!data) {
+  if (!dataGQL) {
     return null;
   }
 
@@ -150,17 +158,9 @@ export default function WebsiteDetails({ websiteId }) {
               <CountriesTable {...tableProps} onDataLoad={setCountryData} />
             </GridColumn>
           </GridRow>
-          <GridRow className={classNames({ [styles.hidden]: !eventsData?.length > 0 })}>
-            <GridColumn xs={12} md={12} lg={4}>
-              <EventsTable {...tableProps} onDataLoad={setEventsData} />
-            </GridColumn>
-            <GridColumn xs={12} md={12} lg={8}>
-              <EventsChart className={styles.eventschart} websiteId={websiteId} />
-            </GridColumn>
-          </GridRow>
         </GridLayout>
       )}
-      {view && chartLoaded && (
+      {/* {view && chartLoaded && (
         <MenuLayout
           className={styles.view}
           menuClassName={styles.menu}
@@ -176,7 +176,7 @@ export default function WebsiteDetails({ websiteId }) {
             virtualize
           />
         </MenuLayout>
-      )}
+      )} */}
     </Page>
   );
 }
