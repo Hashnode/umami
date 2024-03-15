@@ -5,37 +5,16 @@ import Loading from 'components/common/Loading';
 import ErrorMessage from 'components/common/ErrorMessage';
 import useFetch from 'hooks/useFetch';
 import useDateRange from 'hooks/useDateRange';
-import usePageQuery from 'hooks/usePageQuery';
-import useShareToken from 'hooks/useShareToken';
 import { formatShortTime, formatNumber, formatLongNumber } from 'lib/format';
-import { TOKEN_HEADER } from 'lib/constants';
 import MetricCard from './MetricCard';
 import styles from './MetricsBar.module.css';
 
 export default function MetricsBar({ websiteId, className, domain }) {
-  const shareToken = useShareToken();
   const [dateRange] = useDateRange(websiteId);
-  const { startDate, endDate, modified } = dateRange;
+  const { startDate, endDate} = dateRange;
   const [format, setFormat] = useState(true);
-  const {
-    query: { url, ref },
-  } = usePageQuery();
 
-  const { data, error, loading } = useFetch(
-    `/api/website/${websiteId}/stats`,
-    {
-      params: {
-        start_at: +startDate,
-        end_at: +endDate,
-        url,
-        ref,
-      },
-      headers: { [TOKEN_HEADER]: shareToken?.token },
-    },
-    [modified, url, ref],
-  );
-
-  const { data: dataGQL } = useFetch(`/api/gql/${domain}/stats`, {
+  const { data, error, loading} = useFetch(`/api/gql/${domain}/stats`, {
     params: {
       start_at: +startDate,
       end_at: +endDate,
@@ -50,21 +29,14 @@ export default function MetricsBar({ websiteId, className, domain }) {
     setFormat(state => !state);
   }
 
-  const { pageviews, uniques, bounces, totaltime } = data || {};
-  const diffs = data && {
-    pageviews: pageviews.value - pageviews.change,
-    uniques: uniques.value - uniques.change,
-    bounces: bounces.value - bounces.change,
-    totaltime: totaltime.value - totaltime.change,
-  };
-  const views = dataGQL?.data?.publication?.analytics?.views?.edges[0]?.node;
-  const pastViews = dataGQL?.data?.publication?.analytics?.pastViews?.edges[0]?.node;
-  const visitors = dataGQL?.data?.publication?.analytics?.visitors?.edges[0]?.node;
-  const pastVisitors = dataGQL?.data?.publication?.analytics?.pastVisitors?.edges[0]?.node;
+  const views = data?.data?.publication?.analytics?.views?.edges[0]?.node;
+  const pastViews = data?.data?.publication?.analytics?.pastViews?.edges[0]?.node;
+  const visitors = data?.data?.publication?.analytics?.visitors?.edges[0]?.node;
+  const pastVisitors = data?.data?.publication?.analytics?.pastVisitors?.edges[0]?.node;
   const averageVisitTimeInSeconds =
-    dataGQL?.data?.publication?.analytics?.averageVisitTimeInSeconds;
+    data?.data?.publication?.analytics?.averageVisitTimeInSeconds;
   const pastAverageVisitTimeInSeconds =
-    dataGQL?.data?.publication?.analytics?.pastAverageVisitTimeInSeconds;
+    data?.data?.publication?.analytics?.pastAverageVisitTimeInSeconds;
 
   return (
     <div className={classNames(styles.bar, className)} onClick={handleSetFormat}>

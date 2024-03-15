@@ -7,6 +7,7 @@ import Page from 'components/layout/Page';
 import GridLayout, { GridRow, GridColumn } from 'components/layout/GridLayout';
 // import MenuLayout from 'components/layout/MenuLayout';
 import Link from 'components/common/Link';
+import MenuLayout from 'components/layout/MenuLayout';
 import Loading from 'components/common/Loading';
 import Arrow from 'assets/arrow-right.svg';
 import styles from './WebsiteDetails.module.css';
@@ -46,7 +47,6 @@ export default function WebsiteDetails({ websiteId }) {
 }
 
 function MainContent({ data, websiteId }) {
-  const { data: dataGQL } = useFetch(`/api/gql/${data.domain}/pageviews`, {}, []);
   const [chartLoaded, setChartLoaded] = useState(false);
   const [countryData, setCountryData] = useState();
   const {
@@ -110,10 +110,6 @@ function MainContent({ data, websiteId }) {
     }
   }
 
-  if (!dataGQL) {
-    return null;
-  }
-
   return (
     <Page>
       <div className="row">
@@ -160,7 +156,7 @@ function MainContent({ data, websiteId }) {
           </GridRow>
         </GridLayout>
       )}
-      {/* {view && chartLoaded && (
+      {view && chartLoaded && (
         <MenuLayout
           className={styles.view}
           menuClassName={styles.menu}
@@ -176,7 +172,7 @@ function MainContent({ data, websiteId }) {
             virtualize
           />
         </MenuLayout>
-      )} */}
+      )}
     </Page>
   );
 }

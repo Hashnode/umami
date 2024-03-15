@@ -5,20 +5,23 @@ import { ok } from 'lib/response';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain } = req.query;
+  const { start_at, end_at, domain, groupByUnit, groupByValue  } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
     startDate: start_at,
     endDate: end_at,
+    groupByUnit,
+    groupByValue,
   });
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, domain, startDate, endDate }) {
+async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit }) {
   try {
-    const from = new Date(parseInt(startDate));
-    const to = new Date(parseInt(endDate));
+    const from = new Date(parseInt(startDate)).toISOString();
+    const to = new Date(parseInt(endDate)).toISOString();
+    const granularity = getGroupBy(groupByUnit);
     const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
       method: 'POST',
       headers: {
@@ -39,7 +42,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
               },
             },
           },
-          vistorsFilter: {
+          visitorsFilter: {
             time: {
               absolute: {
                 from,
@@ -47,44 +50,87 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
               },
             },
           },
+          groupBy: {
+            granularity,
+          },
+          visitorsGroupBy: {
+            granularity,
+          },
         },
       }),
     });
     const response = await data.json();
     return mapData(response);
   } catch (error) {
-    console.error(`error`, error); // TODO: remove this
+    console.error(`error pageviews`, error); // TODO: remove this
+  }
+}
+
+function getGroupBy(unit){
+  switch (unit) {
+    case 'hour': 
+      return 'HOURLY';
+    case 'day':
+      return 'DAILY';
+    case 'week':
+      return 'WEEKLY';
+    case 'month':
+      return 'MONTHLY';
+    case 'year':
+      return 'YEARLY';
+    default:
+      return 'DAILY';
   }
 }
 
 const query = `
-query Query($host: String, $first: Int!, $filter: PublicationViewsFilter,  $visitorsFilter: PublicationVisitorsFilter) {
+query Query(
+  $host: String
+  $first: Int!
+  $filter: PublicationViewsFilter
+  $visitorsFilter: PublicationVisitorsFilter
+  $groupBy: PublicationViewsGroupBy
+  $visitorsGroupBy: PublicationVisitorsGroupBy
+) {
   publication(host: $host) {
     url
     analytics {
-      views(first: $first, filter: $filter) {
+      views(first: $first, filter: $filter, groupBy: $groupBy) {
         edges {
           node {
             id
-            from
-            to
             total
+            ... on GroupedByTimeViews {
+              id
+              total
+              from
+              to
+            }
           }
         }
       }
-      visitors(first: $first, filter: $visitorsFilter) {
+      visitors(
+        first: $first
+        filter: $visitorsFilter
+        groupBy: $visitorsGroupBy
+      ) {
         edges {
           node {
             id
-            from
-            to
             total
+            ... on GroupedByTimeVisitors {
+              id
+              total
+              from
+              to
+            }
           }
         }
       }
     }
   }
-}`;
+}
+`;
 
 const mapData = (data) => {
   const pageviews = data?.data?.publication?.analytics?.views?.edges.map((item) => ({

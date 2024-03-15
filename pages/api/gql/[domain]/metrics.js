@@ -30,7 +30,7 @@ async function getAnalyticsData({ token, type, limit, domain, startDate, endDate
         query: getQuery(type),
         variables: {
           // host: domain.replace('.dev', '.hashnode.dev'), // TODO: Remove replace, this is for testing only
-          host: "iamshadmirza.hashnode.dev",
+          host: 'iamshadmirza.hashnode.dev',
           first: parseInt(limit || 10),
         },
         filter: {
@@ -46,7 +46,7 @@ async function getAnalyticsData({ token, type, limit, domain, startDate, endDate
     const response = await data.json();
     return dataMappers(type, response);
   } catch (error) {
-    console.error(`error`, error); // TODO: remove this
+    console.error(`error metrics`, error); // TODO: remove this
   }
 }
 
@@ -62,8 +62,6 @@ function getQuery(type) {
                 edges {
                 node {
                     id
-                    from
-                    to
                     total
                 }
                 }
@@ -76,13 +74,9 @@ function getQuery(type) {
                 edges {
                 node {
                     id
-                    from
-                    to
                     total
                     ... on GroupedByDeviceTypeViews {
                     id
-                    from
-                    to
                     total
                     deviceType
                     }
@@ -103,8 +97,6 @@ function getQuery(type) {
                                 edges {
                                 node {
                                     id
-                                    from
-                                    to
                                     total
                                     }
                                 }
@@ -115,13 +107,9 @@ function getQuery(type) {
                             edges {
                             node {
                                 id
-                                from
-                                to
                                 total
                                 ... on GroupedByBrowserViews {
                                     id
-                                    from
-                                    to
                                     total
                                     browser
                                     }
@@ -142,8 +130,6 @@ function getQuery(type) {
                                 edges {
                                 node {
                                     id
-                                    from
-                                    to
                                     total
                                     }
                                 }
@@ -154,13 +140,9 @@ function getQuery(type) {
                             edges {
                             node {
                                 id
-                                from
-                                to
                                 total
                                 ... on GroupedByOperatingSystemViews {
                                     id
-                                    from
-                                    to
                                     total
                                     operatingSystem
                                     }
@@ -179,12 +161,10 @@ function getQuery(type) {
             analytics {
             totalViews: views(first: $first, filter: $filter) {
                 edges {
-                node {
+                  node {
                     id
-                    from
-                    to
                     total
-                }
+                  }
                 }
             }
             countryViews: views(
@@ -195,13 +175,9 @@ function getQuery(type) {
                 edges {
                 node {
                     id
-                    from
-                    to
                     total
                     ... on GroupedByCountryViews {
                     id
-                    from
-                    to
                     total
                     country
                     }
@@ -222,8 +198,6 @@ function getQuery(type) {
                                 edges {
                                 node {
                                     id
-                                    from
-                                    to
                                     total
                                     }
                                 }
@@ -234,13 +208,9 @@ function getQuery(type) {
                             edges {
                             node {
                                 id
-                                from
-                                to
                                 total
                                 ... on GroupedByReferrerHostViews {
                                     id
-                                    from
-                                    to
                                     total
                                     referrerHost
                                     }
@@ -261,8 +231,6 @@ function getQuery(type) {
                                 edges {
                                 node {
                                     id
-                                    from
-                                    to
                                     total
                                     }
                                 }
@@ -273,13 +241,9 @@ function getQuery(type) {
                             edges {
                             node {
                                 id
-                                from
-                                to
                                 total
                                 ... on GroupedByPathViews {
                                     id
-                                    from
-                                    to
                                     total
                                     path
                                     }
@@ -300,8 +264,6 @@ function getQuery(type) {
                                 edges {
                                 node {
                                     id
-                                    from
-                                    to
                                     total
                                     }
                                 }

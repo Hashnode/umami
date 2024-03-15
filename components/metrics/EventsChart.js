@@ -16,8 +16,6 @@ export default function EventsChart({ websiteId, className, token }) {
   const { query } = usePageQuery();
   const shareToken = useShareToken();
 
-  // need changes here
-
   const { data, loading } = useFetch(
     `/api/website/${websiteId}/events`,
     {
