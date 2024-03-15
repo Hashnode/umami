@@ -8,18 +8,28 @@ import useDateRange from 'hooks/useDateRange';
 import { formatShortTime, formatNumber, formatLongNumber } from 'lib/format';
 import MetricCard from './MetricCard';
 import styles from './MetricsBar.module.css';
+import usePageQuery from 'hooks/usePageQuery';
 
 export default function MetricsBar({ websiteId, className, domain }) {
   const [dateRange] = useDateRange(websiteId);
-  const { startDate, endDate} = dateRange;
+  const { startDate, endDate, modified, unit, value} = dateRange;
   const [format, setFormat] = useState(true);
+  const {
+    query: { url, ref },
+  } = usePageQuery();
 
-  const { data, error, loading} = useFetch(`/api/gql/${domain}/stats`, {
-    params: {
-      start_at: +startDate,
-      end_at: +endDate,
+  const { data, error, loading } = useFetch(
+    `/api/gql/${domain}/stats`,
+    {
+      params: {
+        start_at: +startDate,
+        end_at: +endDate,
+        groupByUnit:  unit,
+        groupByValue: value,
+      },
     },
-  });
+    [modified, url, ref],
+  );
 
   const formatFunc = format
     ? n => (n >= 0 ? formatLongNumber(n) : `-${formatLongNumber(Math.abs(n))}`)
