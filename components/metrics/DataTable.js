@@ -57,7 +57,7 @@ export default function DataTable({
       <div className={styles.body} style={{ height }}>
         {data?.length === 0 && <NoData />}
         {virtualize && data.length > 0 ? (
-          <FixedSizeList height={height} itemCount={data.length} itemSize={30}>
+          <FixedSizeList height={height} itemCount={data.length} itemSize={10}>
             {Row}
           </FixedSizeList>
         ) : (
