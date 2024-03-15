@@ -5,12 +5,17 @@ import { ok } from 'lib/response';
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
   const { start_at, end_at, domain } = req.query;
-  const data = await getAnalyticsData({ token: jwtToken, domain, startDate: start_at, endDate: end_at });
+  const data = await getAnalyticsData({
+    token: jwtToken,
+    domain,
+    startDate: start_at,
+    endDate: end_at,
+  });
   return ok(res, data);
 };
 
 async function getAnalyticsData({ token, domain, startDate, endDate }) {
-  console.log('can use start and end date', domain, startDate, endDate);
+  console.log('domain', domain);
   try {
     const from = new Date(parseInt(startDate));
     const to = new Date(parseInt(endDate));
