@@ -29,6 +29,7 @@ export default function MetricsTable({
   const {
     resolve,
     router,
+    query: { url, ref },
   } = usePageQuery();
 
   const { data, loading, error } = useFetch(
@@ -43,7 +44,7 @@ export default function MetricsTable({
       onDataLoad,
       delay: DEFAULT_ANIMATION_DURATION,
     },
-    [modified],
+    [modified, url, ref],
   );
 
   const filteredData = useMemo(() => {

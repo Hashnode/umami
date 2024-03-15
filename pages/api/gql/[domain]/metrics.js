@@ -18,8 +18,8 @@ export default async (req, res) => {
 
 async function getAnalyticsData({ token, type, limit, domain, startDate, endDate }) {
   try {
-    const from = new Date(parseInt(startDate));
-    const to = new Date(parseInt(endDate));
+    const from = new Date(parseInt(startDate)).toISOString();
+    const to = new Date(parseInt(endDate)).toISOString();
     const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
       method: 'POST',
       headers: {
@@ -32,12 +32,12 @@ async function getAnalyticsData({ token, type, limit, domain, startDate, endDate
           // host: domain.replace('.dev', '.hashnode.dev'), // TODO: Remove replace, this is for testing only
           host: 'iamshadmirza.hashnode.dev',
           first: parseInt(limit || 10),
-        },
-        filter: {
-          time: {
-            absolute: {
-              from,
-              to,
+          filter: {
+            time: {
+              absolute: {
+                from,
+                to,
+              },
             },
           },
         },
@@ -46,7 +46,7 @@ async function getAnalyticsData({ token, type, limit, domain, startDate, endDate
     const response = await data.json();
     return dataMappers(type, response);
   } catch (error) {
-    console.error(`error metrics`, error); // TODO: remove this
+   throw new Error(error);
   }
 }
 
@@ -54,11 +54,11 @@ function getQuery(type) {
   switch (type) {
     case 'device':
       return `
-        query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
+        query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
         publication(host: $host) {
             url
             analytics {
-            totalViews: views(first: $first, filter: $filter) {
+            totalViews: visitors(first: $first, filter: $filter) {
                 edges {
                 node {
                     id
@@ -66,7 +66,7 @@ function getQuery(type) {
                 }
                 }
             }
-            deviceViews: views(
+            deviceViews: visitors(
                 first: $first
                 filter: $filter
                 groupBy: { dimension: DEVICE_TYPE }
@@ -75,7 +75,7 @@ function getQuery(type) {
                 node {
                     id
                     total
-                    ... on GroupedByDeviceTypeViews {
+                    ... on GroupedByDeviceTypeVisitors {
                     id
                     total
                     deviceType
@@ -89,11 +89,11 @@ function getQuery(type) {
     `;
     case 'browser':
       return `
-            query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
+            query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
                 publication(host: $host) {
                     url
                     analytics {
-                        totalViews: views(first: $first, filter: $filter) {
+                        totalViews: visitors(first: $first, filter: $filter) {
                                 edges {
                                 node {
                                     id
@@ -101,14 +101,14 @@ function getQuery(type) {
                                     }
                                 }
                             }
-                        browserViews: views(first: $first, filter: $filter, groupBy: {
+                        browserViews: visitors(first: $first, filter: $filter, groupBy: {
                             dimension: BROWSER
                         }) {
                             edges {
                             node {
                                 id
                                 total
-                                ... on GroupedByBrowserViews {
+                                ... on GroupedByBrowserVisitors {
                                     id
                                     total
                                     browser
@@ -122,11 +122,11 @@ function getQuery(type) {
         `;
     case 'os':
       return `
-            query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
+            query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
                 publication(host: $host) {
                     url
                     analytics {
-                        totalViews: views(first: $first, filter: $filter) {
+                        totalViews: visitors(first: $first, filter: $filter) {
                                 edges {
                                 node {
                                     id
@@ -134,14 +134,14 @@ function getQuery(type) {
                                     }
                                 }
                             }
-                        operatingSystenViews: views(first: $first, filter: $filter, groupBy: {
+                        operatingSystenViews: visitors(first: $first, filter: $filter, groupBy: {
                             dimension: OPERATING_SYSTEM
                         }) {
                             edges {
                             node {
                                 id
                                 total
-                                ... on GroupedByOperatingSystemViews {
+                                ... on GroupedByOperatingSystemVisitors {
                                     id
                                     total
                                     operatingSystem
@@ -155,11 +155,11 @@ function getQuery(type) {
         `;
     case 'country':
       return `
-        query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
+        query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
         publication(host: $host) {
             url
             analytics {
-            totalViews: views(first: $first, filter: $filter) {
+            totalViews: visitors(first: $first, filter: $filter) {
                 edges {
                   node {
                     id
@@ -167,7 +167,7 @@ function getQuery(type) {
                   }
                 }
             }
-            countryViews: views(
+            countryViews: visitors(
                 first: $first
                 filter: $filter
                 groupBy: { dimension: COUNTRY }
@@ -176,7 +176,7 @@ function getQuery(type) {
                 node {
                     id
                     total
-                    ... on GroupedByCountryViews {
+                    ... on GroupedByCountryVisitors {
                     id
                     total
                     country
