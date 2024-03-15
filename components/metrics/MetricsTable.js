@@ -12,6 +12,8 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import DataTable from './DataTable';
 import { DEFAULT_ANIMATION_DURATION } from 'lib/constants';
 import styles from './MetricsTable.module.css';
+import { get } from 'lib/web';
+import { useRouter } from 'next/router';
 
 export default function MetricsTable({
   websiteId,
@@ -25,6 +27,7 @@ export default function MetricsTable({
   ...props
 }) {
   const [dateRange] = useDateRange(websiteId);
+  const { basePath } = useRouter();
   const { startDate, endDate, modified } = dateRange;
   const {
     resolve,
@@ -47,6 +50,28 @@ export default function MetricsTable({
     [modified, url, ref],
   );
 
+  async function fetchMoreItems(endCursor) {
+    try {
+      const { data } = await get(
+        `${basePath}/api/gql/${websiteDomain}/metrics`,
+        {
+          type,
+          start_at: +startDate,
+          end_at: +endDate,
+          limit: limit || 10,
+          cursor: endCursor,
+        },
+        {
+          'Content-Type': 'application/json',
+        },
+      );
+      return data;
+    } catch (error) {
+      console.log('error', error);
+      return [];
+    }
+  }
+
   const filteredData = useMemo(() => {
     if (data) {
       const items = data;
@@ -56,6 +81,7 @@ export default function MetricsTable({
       return items.sort(firstBy('y', -1).thenBy('x'));
     }
     return [];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, error, dataFilter, filterOptions]);
 
   return (
@@ -63,7 +89,13 @@ export default function MetricsTable({
       {!data && loading && <Loading />}
       {error && <ErrorMessage />}
       {data && !error && (
-        <DataTable {...props} data={filteredData} className={className} virtualize={!limit} />
+        <DataTable
+          {...props}
+          fetchMoreItems={fetchMoreItems}
+          data={filteredData}
+          className={className}
+          virtualize={!limit}
+        />
       )}
       <div className={styles.footer}>
         {data && !error && limit && (

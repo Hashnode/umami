@@ -88,6 +88,7 @@
     "react-tooltip": "^4.2.21",
     "react-use-measure": "^2.0.4",
     "react-window": "^1.8.6",
+    "react-window-infinite-loader": "^1.0.9",
     "redux": "^4.1.0",
     "redux-thunk": "^2.3.0",
     "request-ip": "^2.1.3",

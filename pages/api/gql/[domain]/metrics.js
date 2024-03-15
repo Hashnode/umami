@@ -4,20 +4,22 @@ import { ok } from 'lib/response';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, type, limit } = req.query;
+  const { start_at, end_at, domain, type, limit, cursor } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
     type,
     limit,
+    cursor,
     startDate: start_at,
     endDate: end_at,
   });
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, type, limit, domain, startDate, endDate }) {
+async function getAnalyticsData({ token, type, limit, cursor, domain, startDate, endDate }) {
   try {
+    console.log('domain', domain);
     const from = new Date(parseInt(startDate)).toISOString();
     const to = new Date(parseInt(endDate)).toISOString();
     const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
@@ -32,6 +34,7 @@ async function getAnalyticsData({ token, type, limit, domain, startDate, endDate
           // host: domain.replace('.dev', '.hashnode.dev'), // TODO: Remove replace, this is for testing only
           host: 'iamshadmirza.hashnode.dev',
           first: parseInt(limit || 10),
+          after: cursor || null,
           filter: {
             time: {
               absolute: {
@@ -46,7 +49,7 @@ async function getAnalyticsData({ token, type, limit, domain, startDate, endDate
     const response = await data.json();
     return dataMappers(type, response);
   } catch (error) {
-   throw new Error(error);
+    throw new Error(error);
   }
 }
 
@@ -54,7 +57,7 @@ function getQuery(type) {
   switch (type) {
     case 'device':
       return `
-        query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
+        query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
         publication(host: $host) {
             url
             analytics {
@@ -72,24 +75,25 @@ function getQuery(type) {
                 groupBy: { dimension: DEVICE_TYPE }
             ) {
                 edges {
-                node {
-                    id
-                    total
-                    ... on GroupedByDeviceTypeVisitors {
-                    id
-                    total
-                    deviceType
-                    }
+                  cursor
+                  node {
+                      id
+                      total
+                      ... on GroupedByDeviceTypeVisitors {
+                      id
+                      total
+                      deviceType
+                      }
+                  }
                 }
-                }
-            }
+              }
             }
         }
         }
     `;
     case 'browser':
       return `
-            query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
+            query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
                 publication(host: $host) {
                     url
                     analytics {
@@ -101,10 +105,11 @@ function getQuery(type) {
                                     }
                                 }
                             }
-                        browserViews: visitors(first: $first, filter: $filter, groupBy: {
+                        browserViews: visitors(first: $first, after: $after, filter: $filter, groupBy: {
                             dimension: BROWSER
                         }) {
                             edges {
+                            cursor
                             node {
                                 id
                                 total
@@ -122,7 +127,7 @@ function getQuery(type) {
         `;
     case 'os':
       return `
-            query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
+            query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
                 publication(host: $host) {
                     url
                     analytics {
@@ -134,10 +139,11 @@ function getQuery(type) {
                                     }
                                 }
                             }
-                        operatingSystenViews: visitors(first: $first, filter: $filter, groupBy: {
+                        operatingSystenViews: visitors(first: $first, after: $after, filter: $filter, groupBy: {
                             dimension: OPERATING_SYSTEM
                         }) {
                             edges {
+                            cursor
                             node {
                                 id
                                 total
@@ -155,7 +161,7 @@ function getQuery(type) {
         `;
     case 'country':
       return `
-        query Query($host: String, $first: Int!, $filter: PublicationVisitorsFilter) {
+        query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
         publication(host: $host) {
             url
             analytics {
@@ -173,6 +179,7 @@ function getQuery(type) {
                 groupBy: { dimension: COUNTRY }
             ) {
                 edges {
+                cursor
                 node {
                     id
                     total
@@ -190,7 +197,7 @@ function getQuery(type) {
         `;
     case 'referrer':
       return `
-            query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
+            query Query($host: String, $first: Int!, $after: String, $filter: PublicationViewsFilter) {
                 publication(host: $host) {
                     url
                     analytics {
@@ -202,10 +209,11 @@ function getQuery(type) {
                                     }
                                 }
                             }
-                        referrerViews: views(first: $first, filter: $filter, groupBy: {
+                        referrerViews: views(first: $first, after: $after, filter: $filter, groupBy: {
                             dimension: REFERRER_HOST
                         }) {
                             edges {
+                            cursor
                             node {
                                 id
                                 total
@@ -223,7 +231,7 @@ function getQuery(type) {
         `;
     case 'url':
       return `
-            query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
+            query Query($host: String, $first: Int!, $after: String, $filter: PublicationViewsFilter) {
                 publication(host: $host) {
                     url
                     analytics {
@@ -235,10 +243,11 @@ function getQuery(type) {
                                     }
                                 }
                             }
-                        pathViews: views(first: $first, filter: $filter, groupBy: {
+                        pathViews: views(first: $first, after: $after, filter: $filter, groupBy: {
                             dimension: PATH
                         }) {
                             edges {
+                            cursor
                             node {
                                 id
                                 total
@@ -262,6 +271,7 @@ function getQuery(type) {
                         analytics {
                             views(first: $first, filter: $filter) {
                                 edges {
+                                cursor
                                 node {
                                     id
                                     total
@@ -280,55 +290,61 @@ function dataMappers(type, data) {
     case 'device': {
       const edges = data?.data?.publication?.analytics?.deviceViews?.edges || [];
       const totalViews = data?.data?.publication?.analytics?.totalViews?.edges[0]?.node?.total;
-      return edges.map(({ node }) => ({
+      return edges.map(({ node, cursor }) => ({
         x: node.deviceType.toLowerCase(),
         y: node.total,
         z: (node.total / totalViews) * 100,
+        cursor,
       }));
     }
     case 'browser': {
       const edges = data?.data?.publication?.analytics?.browserViews?.edges || [];
       const totalViews = data?.data?.publication?.analytics?.totalViews?.edges[0]?.node?.total;
-      return edges.map(({ node }) => ({
+      return edges.map(({ node, cursor }) => ({
         x: node.browser,
         y: node.total,
         z: (node.total / totalViews) * 100,
+        cursor,
       }));
     }
     case 'os': {
       const edges = data?.data?.publication?.analytics?.operatingSystenViews?.edges || [];
       const totalViews = data?.data?.publication?.analytics?.totalViews?.edges[0]?.node?.total;
-      return edges.map(({ node }) => ({
+      return edges.map(({ node, cursor }) => ({
         x: node.operatingSystem,
         y: node.total,
         z: (node.total / totalViews) * 100,
+        cursor,
       }));
     }
     case 'country': {
       const edges = data?.data?.publication?.analytics?.countryViews?.edges || [];
       const totalViews = data?.data?.publication?.analytics?.totalViews?.edges[0]?.node?.total;
-      return edges.map(({ node }) => ({
+      return edges.map(({ node, cursor }) => ({
         x: node.country,
         y: node.total,
         z: (node.total / totalViews) * 100,
+        cursor,
       }));
     }
     case 'referrer': {
       const edges = data?.data?.publication?.analytics?.referrerViews?.edges || [];
       const totalViews = data?.data?.publication?.analytics?.totalViews?.edges[0]?.node?.total;
-      return edges.map(({ node }) => ({
+      return edges.map(({ node, cursor }) => ({
         x: node.referrerHost,
         y: node.total,
         z: (node.total / totalViews) * 100,
+        cursor,
       }));
     }
     case 'url': {
       const edges = data?.data?.publication?.analytics?.pathViews?.edges || [];
       const totalViews = data?.data?.publication?.analytics?.totalViews?.edges[0]?.node?.total;
-      return edges.map(({ node }) => ({
+      return edges.map(({ node, cursor }) => ({
         x: node.path,
         y: node.total,
         z: (node.total / totalViews) * 100,
+        cursor,
       }));
     }
     default: {
