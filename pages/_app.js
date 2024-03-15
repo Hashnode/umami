@@ -27,15 +27,17 @@ const Intl = ({ children }) => {
 export default function App({ Component, pageProps }) {
   useForceSSL(process.env.FORCE_SSL);
   const store = useStore();
-  const { basePath } = useRouter();
+  const { basePath, pathname } = useRouter();
+  // Set from Share page Layout instead
+  const isSharePage = pathname.substring(0, 6) === '/share';
 
   return (
     <Provider store={store}>
       <Head>
-        <link rel="icon" href={`${basePath}/favicon.ico`} />
-        <link rel="apple-touch-icon" sizes="180x180" href={`${basePath}/apple-touch-icon.png`} />
+        {!isSharePage ? <link rel="icon" href={`${basePath}/favicon.ico`} /> : null}
+        {/* <link rel="apple-touch-icon" sizes="180x180" href={`${basePath}/apple-touch-icon.png`} />
         <link rel="icon" type="image/png" sizes="32x32" href={`${basePath}/favicon-32x32.png`} />
-        <link rel="icon" type="image/png" sizes="16x16" href={`${basePath}/favicon-16x16.png`} />
+        <link rel="icon" type="image/png" sizes="16x16" href={`${basePath}/favicon-16x16.png`} /> */}
         <link rel="manifest" href={`${basePath}/site.webmanifest`} />
         <link rel="mask-icon" href={`${basePath}/safari-pinned-tab.svg`} color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />

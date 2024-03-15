@@ -48,6 +48,7 @@ export default function MetricsBar({ websiteId, className, domain }) {
   const pastAverageVisitTimeInSeconds =
     data?.data?.publication?.analytics?.pastAverageVisitTimeInSeconds;
 
+
   return (
     <div className={classNames(styles.bar, className)} onClick={handleSetFormat}>
       {!data && loading && <Loading />}
