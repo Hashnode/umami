@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FixedSizeList } from 'react-window';
 import { useSpring, animated, config } from 'react-spring';
 import classNames from 'classnames';
@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import NoData from 'components/common/NoData';
 import { formatNumber, formatLongNumber } from 'lib/format';
 import styles from './DataTable.module.css';
+import InfiniteLoader from 'react-window-infinite-loader';
 
 export default function DataTable({
   data,
@@ -15,12 +16,25 @@ export default function DataTable({
   renderLabel,
   height,
   animate = true,
+  fetchMoreItems,
   virtualize = false,
 }) {
+  const [paginatedData, setPaginatedData] = useState(data);
   const [format, setFormat] = useState(true);
   const formatFunc = format ? formatLongNumber : formatNumber;
 
   const handleSetFormat = () => setFormat(state => !state);
+
+  const isItemLoaded = index => index < data.length;
+  const onLoadMoreItems = async () => {
+    const endCursor = paginatedData[paginatedData.length - 1].cursor;
+    const newData = await fetchMoreItems(endCursor);
+    setPaginatedData(prevData => [...prevData, ...newData]);
+  };
+
+  useEffect(() => {
+    setPaginatedData(data);
+  }, [data]);
 
   const getRow = row => {
     const { x: label, y: value, z: percent } = row;
@@ -43,7 +57,7 @@ export default function DataTable({
   };
 
   const Row = ({ index, style }) => {
-    return <div style={style}>{getRow(data[index])}</div>;
+    return <div style={style}>{getRow(paginatedData[index])}</div>;
   };
 
   return (
@@ -56,12 +70,26 @@ export default function DataTable({
       </div>
       <div className={styles.body} style={{ height }}>
         {data?.length === 0 && <NoData />}
-        {virtualize && data.length > 0 ? (
-          <FixedSizeList height={height} itemCount={data.length} itemSize={10}>
-            {Row}
-          </FixedSizeList>
+        {virtualize && paginatedData.length > 0 ? (
+          <InfiniteLoader
+            itemCount={1000}
+            loadMoreItems={onLoadMoreItems}
+            isItemLoaded={isItemLoaded}
+          >
+            {({ onItemsRendered, ref }) => (
+              <FixedSizeList
+                height={height}
+                itemCount={paginatedData.length}
+                itemSize={30}
+                onItemsRendered={onItemsRendered}
+                ref={ref}
+              >
+                {Row}
+              </FixedSizeList>
+            )}
+          </InfiniteLoader>
         ) : (
-          data.map(row => getRow(row))
+          paginatedData.map(row => getRow(row))
         )}
       </div>
     </div>
