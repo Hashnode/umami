@@ -39,7 +39,7 @@ export default function MetricsTable({
         type,
         start_at: +startDate,
         end_at: +endDate,
-        limit
+        limit: limit || 10,
       },
       onDataLoad,
       delay: DEFAULT_ANIMATION_DURATION,
@@ -62,7 +62,9 @@ export default function MetricsTable({
     <div className={classNames(styles.container, className)}>
       {!data && loading && <Loading />}
       {error && <ErrorMessage />}
-      {data && !error && <DataTable {...props} data={filteredData} className={className} />}
+      {data && !error && (
+        <DataTable {...props} data={filteredData} className={className} virtualize={!limit} />
+      )}
       <div className={styles.footer}>
         {data && !error && limit && (
           <Link
