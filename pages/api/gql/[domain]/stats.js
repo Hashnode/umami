@@ -19,11 +19,12 @@ export default async (req, res) => {
 
 async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue }) {
   try {
-    const from = new Date(parseInt(startDate));
-    const to = new Date(parseInt(endDate));
+    let from = new Date(parseInt(startDate)), to = new Date(parseInt(endDate));
     const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
-    const pastFrom = sub(from, differenceKeyValuePair);
-    const pastTo = from;
+    const pastFrom = sub(from, differenceKeyValuePair).toISOString();
+    const pastTo = from.toISOString();
+    from = from.toISOString();
+    to = to.toISOString();
     const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
       method: 'POST',
       headers: {
