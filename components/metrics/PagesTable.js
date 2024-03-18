@@ -50,6 +50,7 @@ export default function PagesTable({ websiteId, websiteDomain, showFilters, ...p
         type="url"
         metric={<FormattedMessage id="metrics.views" defaultMessage="Views" />}
         websiteId={websiteId}
+        websiteDomain={websiteDomain}
         dataFilter={urlFilter}
         filterOptions={{ domain: websiteDomain, raw: filter === FILTER_RAW }}
         renderLabel={renderLink}

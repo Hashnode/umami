@@ -30,8 +30,7 @@ async function getAnalyticsData({ token, type, limit, cursor, domain, startDate,
       body: JSON.stringify({
         query: getQuery(type),
         variables: {
-          // host: domain.replace('.dev', '.hashnode.dev'), // TODO: Remove replace, this is for testing only
-          host: 'iamshadmirza.hashnode.dev',
+          host: domain,
           first: parseInt(limit || 10),
           after: cursor || null,
           filter: {

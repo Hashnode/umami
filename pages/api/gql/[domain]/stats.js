@@ -35,8 +35,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
       body: JSON.stringify({
         query,
         variables: {
-          // host: domain.replace('.dev', '.hashnode.dev'),
-          host: 'iamshadmirza.hashnode.dev',
+          host: domain,
           first: 5,
           filter: {
             time: {

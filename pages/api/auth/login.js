@@ -7,9 +7,9 @@ import { ok, unauthorized, badRequest } from 'lib/response';
 export default async (req, res) => {
   const { username, password } = req.body;
 
-  // if (!username || !password) {
-  //   return badRequest(res);
-  // }
+  if (!username || !password) {
+    return badRequest(res);
+  }
 
   const account = await getAccountByUsername(username);
 
