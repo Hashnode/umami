@@ -19,7 +19,6 @@ export default async (req, res) => {
 
 async function getAnalyticsData({ token, type, limit, cursor, domain, startDate, endDate }) {
   try {
-    console.log('domain', domain);
     const from = new Date(parseInt(startDate)).toISOString();
     const to = new Date(parseInt(endDate)).toISOString();
     const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
@@ -71,6 +70,7 @@ function getQuery(type) {
             }
             deviceViews: visitors(
                 first: $first
+                after: $after
                 filter: $filter
                 groupBy: { dimension: DEVICE_TYPE }
             ) {
@@ -176,6 +176,7 @@ function getQuery(type) {
             countryViews: visitors(
                 first: $first
                 filter: $filter
+                after: $after
                 groupBy: { dimension: COUNTRY }
             ) {
                 edges {
