@@ -60,9 +60,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit
     });
     const response = await data.json();
     return mapData(response);
-  } catch (error) {
-    console.error(`error pageviews`, error); // TODO: remove this
-  }
+  } catch (error) {}
 }
 
 function getGroupBy(unit){

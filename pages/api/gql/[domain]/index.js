@@ -46,7 +46,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
     const response = await data.json();
     return response;
   } catch (error) {
-    console.error(`error`, error); // TODO: remove this
+    console.error(`error`, error);
   }
 }
 

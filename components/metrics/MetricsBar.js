@@ -13,7 +13,6 @@ import usePageQuery from 'hooks/usePageQuery';
 export default function MetricsBar({ websiteId, className, domain }) {
   const [dateRange] = useDateRange(websiteId);
   const { startDate, endDate, modified, unit, value} = dateRange;
-  console.log(` unit, value`,  unit, value); // TODO: remove this
   const [format, setFormat] = useState(true);
   const {
     query: { url, ref },

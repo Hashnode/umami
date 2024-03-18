@@ -89,12 +89,16 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
     const response = await data.json();
     return response;
   } catch (error) {
-    console.error(`error stats`, error); // TODO: remove this
+    console.error(`error stats`, error);
   }
 }
 
 function getDifferenceKeyValuePair(unit, from, to) {
   switch (unit) {
+    case '1day':
+      return {
+        'days': 1
+      }
     case '7day':
       return {
         'days': 7
