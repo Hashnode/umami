@@ -13,6 +13,7 @@ import usePageQuery from 'hooks/usePageQuery';
 export default function MetricsBar({ websiteId, className, domain }) {
   const [dateRange] = useDateRange(websiteId);
   const { startDate, endDate, modified, unit, value} = dateRange;
+  console.log(` unit, value`,  unit, value); // TODO: remove this
   const [format, setFormat] = useState(true);
   const {
     query: { url, ref },
@@ -57,13 +58,13 @@ export default function MetricsBar({ websiteId, className, domain }) {
           <MetricCard
             label={<FormattedMessage id="metrics.views" defaultMessage="Views" />}
             value={views?.total || 0}
-            change={views?.total || 0 - (pastViews?.total || 0)}
+            change={(views?.total || 0) - (pastViews?.total || 0)}
             format={formatFunc}
           />
           <MetricCard
             label={<FormattedMessage id="metrics.visitors" defaultMessage="Visitors" />}
             value={visitors?.total || 0}
-            change={visitors?.total || 0 - (pastVisitors?.total || 0)}
+            change={(visitors?.total || 0) - (pastVisitors?.total || 0)}
             format={formatFunc}
           />
           {/* <MetricCard

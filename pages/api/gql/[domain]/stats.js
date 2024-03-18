@@ -1,31 +1,29 @@
 import { parse } from 'cookie';
-import { differenceInMinutes, sub, subWeeks } from 'date-fns';
+import { differenceInDays, differenceInMinutes, sub } from 'date-fns';
 
 import { ok } from 'lib/response';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain } = req.query;
+  const { start_at, end_at, domain, groupByUnit, groupByValue } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
     startDate: start_at,
     endDate: end_at,
+    groupByUnit,
+    groupByValue,
   });
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, domain, startDate, endDate }) {
+async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue }) {
   try {
-    const from = subWeeks(new Date(parseInt(startDate)), 1);
+    const from = new Date(parseInt(startDate));
     const to = new Date(parseInt(endDate));
-    const difference = differenceInMinutes(to, from);
-    const pastFrom = subWeeks(sub(from, {
-      minutes: difference,
-    }), 1);
-    const pastTo = sub(to, {
-      minutes: difference,
-    });
+    const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
+    const pastFrom = sub(from, differenceKeyValuePair);
+    const pastTo = from;
     const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
       method: 'POST',
       headers: {
@@ -80,8 +78,8 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
           pastAverageVisitTimeFilter: {
             time: {
               absolute: {
-                from: '2024-02-11T06:02:24.278Z',
-                to: '2024-03-12T06:02:24.278Z',
+                from: pastFrom,
+                to: pastTo,
               },
             },
           },
@@ -92,6 +90,41 @@ async function getAnalyticsData({ token, domain, startDate, endDate }) {
     return response;
   } catch (error) {
     console.error(`error stats`, error); // TODO: remove this
+  }
+}
+
+function getDifferenceKeyValuePair(unit, from, to) {
+  switch (unit) {
+    case '7day':
+      return {
+        'days': 7
+      }
+    case '24hour':
+      return {
+        'hours': 24
+      }
+    case '1week':
+      return {
+        'weeks': 1
+      }
+    case '1month':
+      return {
+        'months': 1
+      }
+    case '30day':
+      return {
+        'days': 30
+      }
+    case '90day':
+      return {
+        'days': 90
+      }
+    case 'custom':
+      return {
+        'days': differenceInDays(from, to)
+      }
+    default:
+      return differenceInMinutes(from, to);
   }
 }
 
