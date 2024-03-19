@@ -43,7 +43,7 @@ export default function MetricsTable({
         type,
         start_at: +startDate,
         end_at: +endDate,
-        limit: limit || 5,
+        limit: limit || 10,
       },
       onDataLoad,
       delay: DEFAULT_ANIMATION_DURATION,
@@ -60,7 +60,7 @@ export default function MetricsTable({
           type,
           start_at: +startDate,
           end_at: +endDate,
-          limit: limit || 5,
+          limit: limit || 10,
           cursor: endCursor,
         },
         {
