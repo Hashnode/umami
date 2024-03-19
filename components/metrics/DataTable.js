@@ -27,8 +27,10 @@ export default function DataTable({
 
   const isItemLoaded = index => index < data.length;
   const onLoadMoreItems = async () => {
+    if (paginatedData.length === 0) return;
     const endCursor = paginatedData[paginatedData.length - 1].cursor;
     const newData = await fetchMoreItems(endCursor);
+    console.log(`newData`, newData); // TODO: remove this
     setPaginatedData(prevData => [...prevData, ...newData]);
   };
 

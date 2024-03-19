@@ -20,7 +20,7 @@ export default async (req, res) => {
 
 async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue }) {
   try {
-    let from = new Date(parseInt(startDate)),
+    const from = new Date(parseInt(startDate)),
       to = new Date(parseInt(endDate));
     const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
     const pastFrom = sub(from, differenceKeyValuePair);
@@ -71,8 +71,8 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
           averageVisitTimeFilter: {
             time: {
               absolute: {
-                from: pastFrom,
-                to: pastTo,
+                from: from,
+                to: to,
               },
             },
           },
