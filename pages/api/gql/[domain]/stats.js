@@ -52,7 +52,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
               },
             },
           },
-          vistorsFilter: {
+          visitorsFilter: {
             time: {
               absolute: {
                 from,
