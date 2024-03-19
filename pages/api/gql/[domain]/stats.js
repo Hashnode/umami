@@ -23,10 +23,8 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
     let from = new Date(parseInt(startDate)),
       to = new Date(parseInt(endDate));
     const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
-    const pastFrom = sub(from, differenceKeyValuePair).toISOString();
-    const pastTo = from.toISOString();
-    from = from.toISOString();
-    to = to.toISOString();
+    const pastFrom = sub(from, differenceKeyValuePair);
+    const pastTo = from;
     const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
@@ -154,6 +152,12 @@ const query = `
             node {
               id
               total
+              ... on GroupedByTimeViews {
+              id
+              total
+              from
+              to
+            }
             }
           }
         }
@@ -162,6 +166,12 @@ const query = `
             node {
               id
               total
+              ... on GroupedByTimeViews {
+              id
+              total
+              from
+              to
+            }
             }
           }
         }
@@ -170,6 +180,12 @@ const query = `
             node {
               id
               total
+              ... on GroupedByTimeVisitors {
+              id
+              total
+              from
+              to
+            }
             }
           }
         }
@@ -178,6 +194,12 @@ const query = `
             node {
               id
               total
+              ... on GroupedByTimeVisitors {
+              id
+              total
+              from
+              to
+            }
             }
           }
         }

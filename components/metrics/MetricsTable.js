@@ -14,6 +14,7 @@ import { DEFAULT_ANIMATION_DURATION } from 'lib/constants';
 import styles from './MetricsTable.module.css';
 import { get } from 'lib/web';
 import { useRouter } from 'next/router';
+import { percentFilter } from 'lib/filters';
 
 export default function MetricsTable({
   websiteId,
@@ -74,7 +75,7 @@ export default function MetricsTable({
 
   const filteredData = useMemo(() => {
     if (data) {
-      const items = data;
+      const items = percentFilter(dataFilter ? dataFilter(data, filterOptions) : data);
       if (limit) {
         return items.filter((e, i) => i < limit).sort(firstBy('y', -1).thenBy('x'));
       }

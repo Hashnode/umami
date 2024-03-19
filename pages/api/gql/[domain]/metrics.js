@@ -332,7 +332,7 @@ function dataMappers(type, data) {
       const edges = data?.data?.publication?.analytics?.referrerViews?.edges || [];
       const totalViews = data?.data?.publication?.analytics?.totalViews?.edges[0]?.node?.total;
       return edges.map(({ node, cursor }) => ({
-        x: node.referrerHost,
+        x: 'https://' + node.referrerHost,
         y: node.total,
         z: (node.total / totalViews) * 100,
         cursor,
