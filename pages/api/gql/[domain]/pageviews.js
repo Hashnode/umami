@@ -2,10 +2,11 @@ import { parse } from 'cookie';
 import { format } from 'date-fns';
 
 import { ok } from 'lib/response';
+import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, groupByUnit, groupByValue  } = req.query;
+  const { start_at, end_at, domain, groupByUnit, groupByValue } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
@@ -22,7 +23,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit
     const from = new Date(parseInt(startDate)).toISOString();
     const to = new Date(parseInt(endDate)).toISOString();
     const granularity = getGroupBy(groupByUnit);
-    const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
+    const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,12 +61,14 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit
     });
     const response = await data.json();
     return mapData(response);
-  } catch (error) {}
+  } catch (error) {
+    console.log('error', error);
+  }
 }
 
-function getGroupBy(unit){
+function getGroupBy(unit) {
   switch (unit) {
-    case 'hour': 
+    case 'hour':
       return 'HOURLY';
     case 'day':
       return 'DAILY';
@@ -129,8 +132,8 @@ query Query(
 }
 `;
 
-const mapData = (data) => {
-  const pageviews = data?.data?.publication?.analytics?.views?.edges.map((item) => ({
+const mapData = data => {
+  const pageviews = data?.data?.publication?.analytics?.views?.edges.map(item => ({
     t: format(new Date(item.node.to), 'yyyy-MM-dd HH:mm:ss'),
     y: item.node.total,
   }));
@@ -141,5 +144,5 @@ const mapData = (data) => {
   return {
     pageviews,
     sessions,
-  }
-}
+  };
+};

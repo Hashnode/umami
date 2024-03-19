@@ -1,6 +1,7 @@
 import { parse } from 'cookie';
 
 import { ok } from 'lib/response';
+import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
@@ -15,13 +16,10 @@ export default async (req, res) => {
 };
 
 async function getAnalyticsData({ token, domain, startDate, endDate }) {
-  console.log('domain', domain);
   try {
     const from = new Date(parseInt(startDate));
     const to = new Date(parseInt(endDate));
-    // const pastFrom = subWeeks(from, 1);
-    // const pastTo = subWeeks(to, 1);
-    const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
+    const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

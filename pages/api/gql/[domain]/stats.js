@@ -2,6 +2,7 @@ import { parse } from 'cookie';
 import { differenceInDays, differenceInMinutes, sub } from 'date-fns';
 
 import { ok } from 'lib/response';
+import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
@@ -19,13 +20,14 @@ export default async (req, res) => {
 
 async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue }) {
   try {
-    let from = new Date(parseInt(startDate)), to = new Date(parseInt(endDate));
+    let from = new Date(parseInt(startDate)),
+      to = new Date(parseInt(endDate));
     const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
     const pastFrom = sub(from, differenceKeyValuePair).toISOString();
     const pastTo = from.toISOString();
     from = from.toISOString();
     to = to.toISOString();
-    const data = await fetch(`https://179kej9boe.execute-api.ap-south-1.amazonaws.com/`, {
+    const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,36 +100,36 @@ function getDifferenceKeyValuePair(unit, from, to) {
   switch (unit) {
     case '1day':
       return {
-        'days': 1
-      }
+        days: 1,
+      };
     case '7day':
       return {
-        'days': 7
-      }
+        days: 7,
+      };
     case '24hour':
       return {
-        'hours': 24
-      }
+        hours: 24,
+      };
     case '1week':
       return {
-        'weeks': 1
-      }
+        weeks: 1,
+      };
     case '1month':
       return {
-        'months': 1
-      }
+        months: 1,
+      };
     case '30day':
       return {
-        'days': 30
-      }
+        days: 30,
+      };
     case '90day':
       return {
-        'days': 90
-      }
+        days: 90,
+      };
     case 'custom':
       return {
-        'days': differenceInDays(from, to)
-      }
+        days: differenceInDays(from, to),
+      };
     default:
       return differenceInMinutes(from, to);
   }

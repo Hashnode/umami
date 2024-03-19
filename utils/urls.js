@@ -49,6 +49,28 @@ export const getAppUrl = () => {
   return url;
 };
 
+export const getGQLUrl = () => {
+  const NEXT_PUBLIC_HASHNODE_ENV = process.env.NEXT_PUBLIC_HASHNODE_ENV;
+  const NEXT_PUBLIC_GQL_URL = process.env.NEXT_PUBLIC_GQL_URL;
+  let url;
+
+  switch (NEXT_PUBLIC_HASHNODE_ENV) {
+    case 'development':
+      url = NEXT_PUBLIC_GQL_URL;
+      break;
+    case 'staging':
+      url = 'https://gql.hashnode.xyz';
+      break;
+    case 'production':
+      url = 'https://gql.hashnode.com';
+      break;
+    default:
+      url = 'http://localhost:3001';
+      break;
+  }
+  return url;
+};
+
 const isValidPublicationDomainNamesKey = key => key in publicationDomainNames;
 
 export const createPublicationOrigin = publication => {
