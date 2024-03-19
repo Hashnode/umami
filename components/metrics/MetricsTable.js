@@ -53,7 +53,6 @@ export default function MetricsTable({
 
   async function fetchMoreItems(endCursor) {
     try {
-      console.log('fetch more items', endCursor);
       const { data } = await get(
         `${basePath}/api/gql/${websiteDomain}/metrics`,
         {
