@@ -133,8 +133,8 @@ function getDifferenceKeyValuePair(unit, from, to) {
   }
 }
 
-const query = `
-  query Query(
+const query = /* GraphQL */ `
+  query Stats(
     $host: String
     $first: Int!
     $filter: PublicationViewsFilter
@@ -153,11 +153,11 @@ const query = `
               id
               total
               ... on GroupedByTimeViews {
-              id
-              total
-              from
-              to
-            }
+                id
+                total
+                from
+                to
+              }
             }
           }
         }
@@ -167,11 +167,11 @@ const query = `
               id
               total
               ... on GroupedByTimeViews {
-              id
-              total
-              from
-              to
-            }
+                id
+                total
+                from
+                to
+              }
             }
           }
         }
@@ -181,11 +181,11 @@ const query = `
               id
               total
               ... on GroupedByTimeVisitors {
-              id
-              total
-              from
-              to
-            }
+                id
+                total
+                from
+                to
+              }
             }
           }
         }
@@ -195,11 +195,11 @@ const query = `
               id
               total
               ... on GroupedByTimeVisitors {
-              id
-              total
-              from
-              to
-            }
+                id
+                total
+                from
+                to
+              }
             }
           }
         }

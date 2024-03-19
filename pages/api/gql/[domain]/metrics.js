@@ -55,234 +55,276 @@ async function getAnalyticsData({ token, type, limit, cursor, domain, startDate,
 function getQuery(type) {
   switch (type) {
     case 'device':
-      return `
-        query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
-        publication(host: $host) {
+      return /* GraphQL */ `
+        query MetricsPerDevice(
+          $host: String
+          $first: Int!
+          $after: String
+          $filter: PublicationVisitorsFilter
+        ) {
+          publication(host: $host) {
             url
             analytics {
-            totalViews: visitors(first: $first, filter: $filter) {
+              totalViews: visitors(first: $first, filter: $filter) {
                 edges {
-                node {
+                  node {
                     id
                     total
+                  }
                 }
-                }
-            }
-            deviceViews: visitors(
+              }
+              deviceViews: visitors(
                 first: $first
                 after: $after
                 filter: $filter
                 groupBy: { dimension: DEVICE_TYPE }
-            ) {
+              ) {
                 edges {
                   cursor
                   node {
-                      id
-                      total
-                      ... on GroupedByDeviceTypeVisitors {
+                    id
+                    total
+                    ... on GroupedByDeviceTypeVisitors {
                       id
                       total
                       deviceType
-                      }
+                    }
                   }
                 }
               }
             }
+          }
         }
-        }
-    `;
+      `;
     case 'browser':
-      return `
-            query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
-                publication(host: $host) {
-                    url
-                    analytics {
-                        totalViews: visitors(first: $first, filter: $filter) {
-                                edges {
-                                node {
-                                    id
-                                    total
-                                    }
-                                }
-                            }
-                        browserViews: visitors(first: $first, after: $after, filter: $filter, groupBy: {
-                            dimension: BROWSER
-                        }) {
-                            edges {
-                            cursor
-                            node {
-                                id
-                                total
-                                ... on GroupedByBrowserVisitors {
-                                    id
-                                    total
-                                    browser
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        `;
-    case 'os':
-      return `
-            query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
-                publication(host: $host) {
-                    url
-                    analytics {
-                        totalViews: visitors(first: $first, filter: $filter) {
-                                edges {
-                                node {
-                                    id
-                                    total
-                                    }
-                                }
-                            }
-                        operatingSystenViews: visitors(first: $first, after: $after, filter: $filter, groupBy: {
-                            dimension: OPERATING_SYSTEM
-                        }) {
-                            edges {
-                            cursor
-                            node {
-                                id
-                                total
-                                ... on GroupedByOperatingSystemVisitors {
-                                    id
-                                    total
-                                    operatingSystem
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        `;
-    case 'country':
-      return `
-        query Query($host: String, $first: Int!, $after: String, $filter: PublicationVisitorsFilter) {
-        publication(host: $host) {
+      return /* GraphQL */ `
+        query MetricsPerBrowser(
+          $host: String
+          $first: Int!
+          $after: String
+          $filter: PublicationVisitorsFilter
+        ) {
+          publication(host: $host) {
             url
             analytics {
-            totalViews: visitors(first: $first, filter: $filter) {
+              totalViews: visitors(first: $first, filter: $filter) {
                 edges {
                   node {
                     id
                     total
                   }
                 }
+              }
+              browserViews: visitors(
+                first: $first
+                after: $after
+                filter: $filter
+                groupBy: { dimension: BROWSER }
+              ) {
+                edges {
+                  cursor
+                  node {
+                    id
+                    total
+                    ... on GroupedByBrowserVisitors {
+                      id
+                      total
+                      browser
+                    }
+                  }
+                }
+              }
             }
-            countryViews: visitors(
+          }
+        }
+      `;
+    case 'os':
+      return /* GraphQL */ `
+        query MetricsPerOS(
+          $host: String
+          $first: Int!
+          $after: String
+          $filter: PublicationVisitorsFilter
+        ) {
+          publication(host: $host) {
+            url
+            analytics {
+              totalViews: visitors(first: $first, filter: $filter) {
+                edges {
+                  node {
+                    id
+                    total
+                  }
+                }
+              }
+              operatingSystenViews: visitors(
+                first: $first
+                after: $after
+                filter: $filter
+                groupBy: { dimension: OPERATING_SYSTEM }
+              ) {
+                edges {
+                  cursor
+                  node {
+                    id
+                    total
+                    ... on GroupedByOperatingSystemVisitors {
+                      id
+                      total
+                      operatingSystem
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+    case 'country':
+      return /* GraphQL */ `
+        query MetricsPerCountry(
+          $host: String
+          $first: Int!
+          $after: String
+          $filter: PublicationVisitorsFilter
+        ) {
+          publication(host: $host) {
+            url
+            analytics {
+              totalViews: visitors(first: $first, filter: $filter) {
+                edges {
+                  node {
+                    id
+                    total
+                  }
+                }
+              }
+              countryViews: visitors(
                 first: $first
                 filter: $filter
                 after: $after
                 groupBy: { dimension: COUNTRY }
-            ) {
+              ) {
                 edges {
-                cursor
-                node {
+                  cursor
+                  node {
                     id
                     total
                     ... on GroupedByCountryVisitors {
+                      id
+                      total
+                      country
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+    case 'referrer':
+      return /* GraphQL */ `
+        query MetricsPerReferrer(
+          $host: String
+          $first: Int!
+          $after: String
+          $filter: PublicationViewsFilter
+        ) {
+          publication(host: $host) {
+            url
+            analytics {
+              totalViews: views(first: $first, filter: $filter) {
+                edges {
+                  node {
                     id
                     total
-                    country
+                  }
+                }
+              }
+              referrerViews: views(
+                first: $first
+                after: $after
+                filter: $filter
+                groupBy: { dimension: REFERRER_HOST }
+              ) {
+                edges {
+                  cursor
+                  node {
+                    id
+                    total
+                    ... on GroupedByReferrerHostViews {
+                      id
+                      total
+                      referrerHost
                     }
+                  }
                 }
-                }
+              }
             }
-            }
+          }
         }
-        }
-        `;
-    case 'referrer':
-      return `
-            query Query($host: String, $first: Int!, $after: String, $filter: PublicationViewsFilter) {
-                publication(host: $host) {
-                    url
-                    analytics {
-                        totalViews: views(first: $first, filter: $filter) {
-                                edges {
-                                node {
-                                    id
-                                    total
-                                    }
-                                }
-                            }
-                        referrerViews: views(first: $first, after: $after, filter: $filter, groupBy: {
-                            dimension: REFERRER_HOST
-                        }) {
-                            edges {
-                            cursor
-                            node {
-                                id
-                                total
-                                ... on GroupedByReferrerHostViews {
-                                    id
-                                    total
-                                    referrerHost
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        `;
+      `;
     case 'url':
-      return `
-            query Query($host: String, $first: Int!, $after: String, $filter: PublicationViewsFilter) {
-                publication(host: $host) {
-                    url
-                    analytics {
-                        totalViews: views(first: $first, filter: $filter) {
-                                edges {
-                                node {
-                                    id
-                                    total
-                                    }
-                                }
-                            }
-                        pathViews: views(first: $first, after: $after, filter: $filter, groupBy: {
-                            dimension: PATH
-                        }) {
-                            edges {
-                            cursor
-                            node {
-                                id
-                                total
-                                ... on GroupedByPathViews {
-                                    id
-                                    total
-                                    path
-                                    }
-                                }
-                            }
-                        }
-                    }
+      return /* GraphQL */ `
+        query MetricsPerPath(
+          $host: String
+          $first: Int!
+          $after: String
+          $filter: PublicationViewsFilter
+        ) {
+          publication(host: $host) {
+            url
+            analytics {
+              totalViews: views(first: $first, filter: $filter) {
+                edges {
+                  node {
+                    id
+                    total
+                  }
                 }
+              }
+              pathViews: views(
+                first: $first
+                after: $after
+                filter: $filter
+                groupBy: { dimension: PATH }
+              ) {
+                edges {
+                  cursor
+                  node {
+                    id
+                    total
+                    ... on GroupedByPathViews {
+                      id
+                      total
+                      path
+                    }
+                  }
+                }
+              }
             }
-        `;
+          }
+        }
+      `;
     default:
-      return `
-                query Query($host: String, $first: Int!, $filter: PublicationViewsFilter) {
-                    publication(host: $host) {
-                        url
-                        analytics {
-                            views(first: $first, filter: $filter) {
-                                edges {
-                                cursor
-                                node {
-                                    id
-                                    total
-                                    }
-                                }
-                            }
-                        }
-                    }
+      return /* GraphQL */ `
+        query Stats($host: String, $first: Int!, $filter: PublicationViewsFilter) {
+          publication(host: $host) {
+            url
+            analytics {
+              views(first: $first, filter: $filter) {
+                edges {
+                  cursor
+                  node {
+                    id
+                    total
+                  }
                 }
-            `;
+              }
+            }
+          }
+        }
+      `;
   }
 }
 

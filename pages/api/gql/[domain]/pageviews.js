@@ -83,53 +83,49 @@ function getGroupBy(unit) {
   }
 }
 
-const query = `
-query Query(
-  $host: String
-  $first: Int!
-  $filter: PublicationViewsFilter
-  $visitorsFilter: PublicationVisitorsFilter
-  $groupBy: PublicationViewsGroupBy
-  $visitorsGroupBy: PublicationVisitorsGroupBy
-) {
-  publication(host: $host) {
-    url
-    analytics {
-      views(first: $first, filter: $filter, groupBy: $groupBy) {
-        edges {
-          node {
-            id
-            total
-            ... on GroupedByTimeViews {
+const query = /* GraphQL */ `
+  query Pageviews(
+    $host: String
+    $first: Int!
+    $filter: PublicationViewsFilter
+    $visitorsFilter: PublicationVisitorsFilter
+    $groupBy: PublicationViewsGroupBy
+    $visitorsGroupBy: PublicationVisitorsGroupBy
+  ) {
+    publication(host: $host) {
+      url
+      analytics {
+        views(first: $first, filter: $filter, groupBy: $groupBy) {
+          edges {
+            node {
               id
               total
-              from
-              to
+              ... on GroupedByTimeViews {
+                id
+                total
+                from
+                to
+              }
             }
           }
         }
-      }
-      visitors(
-        first: $first
-        filter: $visitorsFilter
-        groupBy: $visitorsGroupBy
-      ) {
-        edges {
-          node {
-            id
-            total
-            ... on GroupedByTimeVisitors {
+        visitors(first: $first, filter: $visitorsFilter, groupBy: $visitorsGroupBy) {
+          edges {
+            node {
               id
               total
-              from
-              to
+              ... on GroupedByTimeVisitors {
+                id
+                total
+                from
+                to
+              }
             }
           }
         }
       }
     }
   }
-}
 `;
 
 const mapData = data => {
