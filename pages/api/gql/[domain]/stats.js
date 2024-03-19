@@ -35,7 +35,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
         query,
         variables: {
           host: domain,
-          first: 5,
+          first: 1,
           filter: {
             time: {
               absolute: {

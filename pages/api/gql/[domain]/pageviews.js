@@ -33,7 +33,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit
         query,
         variables: {
           host: domain,
-          first: 10,
+          first: 50,
           filter: {
             time: {
               absolute: {
