@@ -18,23 +18,26 @@ export default function DataTable({
   animate = true,
   fetchMoreItems,
   virtualize = false,
+  limit = 10,
 }) {
   const [paginatedData, setPaginatedData] = useState(data);
+  const [hasNextPage, setHasNextPage] = useState(data.length === limit);
   const [format, setFormat] = useState(true);
   const formatFunc = format ? formatLongNumber : formatNumber;
-
   const handleSetFormat = () => setFormat(state => !state);
 
-  const isItemLoaded = index => index < data.length;
+  const isItemLoaded = index => !hasNextPage || index < paginatedData.length;
   const onLoadMoreItems = async () => {
-    if (paginatedData.length === 0) return;
+    if (paginatedData.length === 0 || !hasNextPage) return;
     const endCursor = paginatedData[paginatedData.length - 1].cursor;
+    if (!endCursor) return;
     const newData = await fetchMoreItems(endCursor);
-    console.log(`newData`, newData); // TODO: remove this
+    setHasNextPage(newData.length === limit);
     setPaginatedData(prevData => [...prevData, ...newData]);
   };
 
   useEffect(() => {
+    setHasNextPage(data.length === limit);
     setPaginatedData(data);
   }, [data]);
 
@@ -62,6 +65,7 @@ export default function DataTable({
     return <div style={style}>{getRow(paginatedData[index])}</div>;
   };
 
+  const itemCount = hasNextPage ? paginatedData.length + 1 : paginatedData.length;
   return (
     <div className={classNames(styles.table, className)}>
       <div className={styles.header}>
@@ -74,7 +78,7 @@ export default function DataTable({
         {data?.length === 0 && <NoData />}
         {virtualize && paginatedData.length > 0 ? (
           <InfiniteLoader
-            itemCount={1000}
+            itemCount={itemCount}
             loadMoreItems={onLoadMoreItems}
             isItemLoaded={isItemLoaded}
           >

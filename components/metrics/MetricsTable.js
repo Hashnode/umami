@@ -25,6 +25,7 @@ export default function MetricsTable({
   filterOptions,
   limit,
   onDataLoad,
+  virtualize,
   ...props
 }) {
   const [dateRange] = useDateRange(websiteId);
@@ -35,7 +36,6 @@ export default function MetricsTable({
     router,
     query: { url, ref },
   } = usePageQuery();
-
   const { data, loading, error } = useFetch(
     `/api/gql/${websiteDomain}/metrics`,
     {
@@ -43,7 +43,7 @@ export default function MetricsTable({
         type,
         start_at: +startDate,
         end_at: +endDate,
-        limit: limit || 10,
+        limit: limit || 5,
       },
       onDataLoad,
       delay: DEFAULT_ANIMATION_DURATION,
@@ -53,13 +53,14 @@ export default function MetricsTable({
 
   async function fetchMoreItems(endCursor) {
     try {
+      console.log('fetch more items', endCursor);
       const { data } = await get(
         `${basePath}/api/gql/${websiteDomain}/metrics`,
         {
           type,
           start_at: +startDate,
           end_at: +endDate,
-          limit: limit || 10,
+          limit: limit || 5,
           cursor: endCursor,
         },
         {
@@ -95,7 +96,8 @@ export default function MetricsTable({
           fetchMoreItems={fetchMoreItems}
           data={filteredData}
           className={className}
-          virtualize={!limit}
+          virtualize={virtualize}
+          limit={limit}
         />
       )}
       <div className={styles.footer}>

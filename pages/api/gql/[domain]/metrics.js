@@ -32,7 +32,7 @@ async function getAnalyticsData({ token, type, limit, cursor, domain, startDate,
         query: getQuery(type),
         variables: {
           host: domain,
-          first: parseInt(limit || 10),
+          first: parseInt(limit || 5),
           after: cursor || null,
           filter: {
             time: {

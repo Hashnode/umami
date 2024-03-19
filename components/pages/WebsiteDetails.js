@@ -41,9 +41,7 @@ export default function WebsiteDetails({ websiteId }) {
     return null;
   }
 
-  return (
-    <MainContent data={data} websiteId={websiteId} />
-  );
+  return <MainContent data={data} websiteId={websiteId} />;
 }
 
 function MainContent({ data, websiteId }) {
@@ -99,7 +97,8 @@ function MainContent({ data, websiteId }) {
   const tableProps = {
     websiteId,
     websiteDomain: data?.domain,
-    limit: 10,
+    limit: 5,
+    virtualize: false,
   };
 
   const DetailsComponent = views[view];
@@ -166,8 +165,8 @@ function MainContent({ data, websiteId }) {
           <DetailsComponent
             {...tableProps}
             height={500}
-            limit={false}
-            animte={false}
+            limit={tableProps.limit}
+            animate={false}
             showFilters
             virtualize
           />
