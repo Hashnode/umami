@@ -24,6 +24,8 @@ export default function MetricsBar({ websiteId, className, domain }) {
       params: {
         start_at: +startDate,
         end_at: +endDate,
+        url,
+        ref,
         groupByUnit:  unit,
         groupByValue: value,
       },

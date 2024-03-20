@@ -6,7 +6,7 @@ import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, groupByUnit, groupByValue } = req.query;
+  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
@@ -14,17 +14,43 @@ export default async (req, res) => {
     endDate: end_at,
     groupByUnit,
     groupByValue,
+    url,
+    ref,
   });
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue }) {
+async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue, url, ref }) {
   try {
     const from = new Date(parseInt(startDate)),
       to = new Date(parseInt(endDate));
     const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
     const pastFrom = sub(from, differenceKeyValuePair);
     const pastTo = from;
+    const presentFilter = {
+      time: {
+        absolute: {
+          from,
+          to,
+        },
+      },
+    };
+    const pastFilter = {
+      time: {
+        absolute: {
+          from: pastFrom,
+          to: pastTo,
+        },
+      },
+    };
+    // if (url) {
+    //   presentFilter.paths = [url];
+    //   pastFilter.paths = [url];
+    // }
+    if (ref) {
+      presentFilter.referrerHosts = [ref];
+      pastFilter.referrerHosts = [ref];
+    }
     const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
@@ -36,43 +62,15 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
         variables: {
           host: domain,
           first: 1,
-          filter: {
-            time: {
-              absolute: {
-                from,
-                to,
-              },
-            },
-          },
-          pastFilter: {
-            time: {
-              absolute: {
-                from: pastFrom,
-                to: pastTo,
-              },
-            },
-          },
-          visitorsFilter: {
-            time: {
-              absolute: {
-                from,
-                to,
-              },
-            },
-          },
-          visitorsPastFilter: {
-            time: {
-              absolute: {
-                from: pastFrom,
-                to: pastTo,
-              },
-            },
-          },
+          filter: presentFilter,
+          pastFilter: pastFilter,
+          visitorsFilter: presentFilter,
+          visitorsPastFilter: pastFilter,
           averageVisitTimeFilter: {
             time: {
               absolute: {
-                from: from,
-                to: to,
+                from,
+                to,
               },
             },
           },
