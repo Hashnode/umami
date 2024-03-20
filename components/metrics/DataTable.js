@@ -25,15 +25,19 @@ export default function DataTable({
   const [format, setFormat] = useState(true);
   const formatFunc = format ? formatLongNumber : formatNumber;
   const handleSetFormat = () => setFormat(state => !state);
+  const isItemLoaded = index => !hasNextPage || !paginatedData[index];
 
-  const isItemLoaded = index => !hasNextPage || index < paginatedData.length;
-  const onLoadMoreItems = async () => {
+  const onLoadMoreItems = () => {
     if (paginatedData.length === 0 || !hasNextPage) return;
     const endCursor = paginatedData[paginatedData.length - 1].cursor;
     if (!endCursor) return;
-    const newData = await fetchMoreItems(endCursor);
-    setHasNextPage(newData.length === limit);
-    setPaginatedData(prevData => [...prevData, ...newData]);
+    return new Promise(resolve => {
+      fetchMoreItems(endCursor).then(newData => {
+        setHasNextPage(newData.length === limit);
+        setPaginatedData(prevData => [...prevData, ...newData]);
+        resolve();
+      });
+    });
   };
 
   useEffect(() => {
@@ -62,7 +66,9 @@ export default function DataTable({
   };
 
   const Row = ({ index, style }) => {
-    return <div style={style}>{getRow(paginatedData[index])}</div>;
+    return (
+      <div style={style}>{isItemLoaded(index) ? getRow(paginatedData[index]) : 'Loading...'}</div>
+    );
   };
 
   const itemCount = hasNextPage ? paginatedData.length + 1 : paginatedData.length;
