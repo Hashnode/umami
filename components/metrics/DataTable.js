@@ -39,7 +39,7 @@ export default function DataTable({
   useEffect(() => {
     setHasNextPage(data.length === limit);
     setPaginatedData(data);
-  }, [data]);
+  }, [data, limit]);
 
   const getRow = row => {
     const { x: label, y: value, z: percent } = row;

@@ -13,7 +13,7 @@ export default async (req, res) => {
 
   const account = await getAccountByUsername(username);
 
-  if (true) {
+  if (account && (await checkPassword(password, account.password))) {
     const { user_id, username, is_admin } = account;
     const token = await createSecureToken({ user_id, username, is_admin });
     const cookie = serialize(AUTH_COOKIE_NAME, token, {

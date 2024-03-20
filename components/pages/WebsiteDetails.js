@@ -5,7 +5,6 @@ import WebsiteChart from 'components/metrics/WebsiteChart';
 import WorldMap from 'components/common/WorldMap';
 import Page from 'components/layout/Page';
 import GridLayout, { GridRow, GridColumn } from 'components/layout/GridLayout';
-// import MenuLayout from 'components/layout/MenuLayout';
 import Link from 'components/common/Link';
 import MenuLayout from 'components/layout/MenuLayout';
 import Loading from 'components/common/Loading';
@@ -97,7 +96,7 @@ function MainContent({ data, websiteId }) {
   const tableProps = {
     websiteId,
     websiteDomain: data?.domain,
-    limit: 5,
+    limit: 10,
     virtualize: false,
   };
 
