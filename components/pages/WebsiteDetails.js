@@ -164,7 +164,7 @@ function MainContent({ data, websiteId }) {
           <DetailsComponent
             {...tableProps}
             height={500}
-            limit={tableProps.limit}
+            limit={25}
             animate={false}
             showFilters
             virtualize
