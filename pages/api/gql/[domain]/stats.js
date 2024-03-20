@@ -43,10 +43,10 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
         },
       },
     };
-    // if (url) {
-    //   presentFilter.paths = [url];
-    //   pastFilter.paths = [url];
-    // }
+    if (url) {
+      presentFilter.paths = [url];
+      pastFilter.paths = [url];
+    }
     if (ref) {
       presentFilter.referrerHosts = [ref];
       pastFilter.referrerHosts = [ref];
@@ -66,22 +66,8 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
           pastFilter: pastFilter,
           visitorsFilter: presentFilter,
           visitorsPastFilter: pastFilter,
-          averageVisitTimeFilter: {
-            time: {
-              absolute: {
-                from,
-                to,
-              },
-            },
-          },
-          pastAverageVisitTimeFilter: {
-            time: {
-              absolute: {
-                from: pastFrom,
-                to: pastTo,
-              },
-            },
-          },
+          averageVisitTimeFilter: presentFilter,
+          pastAverageVisitTimeFilter: pastFilter,
         },
       }),
     });
