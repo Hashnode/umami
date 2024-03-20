@@ -100,7 +100,7 @@ export default function MetricsTable({
         />
       )}
       <div className={styles.footer}>
-        {data && !error && limit && (
+        {data && !error && !virtualize && (
           <Link
             icon={<Arrow />}
             href={router.pathname}
