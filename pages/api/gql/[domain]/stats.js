@@ -100,6 +100,10 @@ function getDifferenceKeyValuePair(unit, from, to) {
       return {
         months: 1,
       };
+    case '1year':
+      return {
+        years: 1,
+      };
     case '30day':
       return {
         days: 30,
