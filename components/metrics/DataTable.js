@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { FixedSizeList } from 'react-window';
 import { useSpring, animated, config } from 'react-spring';
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 import NoData from 'components/common/NoData';
 import { formatNumber, formatLongNumber } from 'lib/format';
 import styles from './DataTable.module.css';
-import InfiniteLoader from 'react-window-infinite-loader';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function DataTable({
   data,
@@ -25,19 +24,14 @@ export default function DataTable({
   const [format, setFormat] = useState(true);
   const formatFunc = format ? formatLongNumber : formatNumber;
   const handleSetFormat = () => setFormat(state => !state);
-  const isItemLoaded = index => !hasNextPage || !paginatedData[index];
 
-  const onLoadMoreItems = () => {
+  const onLoadMoreItems = async () => {
     if (paginatedData.length === 0 || !hasNextPage) return;
     const endCursor = paginatedData[paginatedData.length - 1].cursor;
     if (!endCursor) return;
-    return new Promise(resolve => {
-      fetchMoreItems(endCursor).then(newData => {
-        setHasNextPage(newData.length === limit);
-        setPaginatedData(prevData => [...prevData, ...newData]);
-        resolve();
-      });
-    });
+    const data = await fetchMoreItems(endCursor);
+    setHasNextPage(data.length === limit);
+    setPaginatedData(prevData => [...prevData, ...data]);
   };
 
   useEffect(() => {
@@ -65,13 +59,6 @@ export default function DataTable({
     );
   };
 
-  const Row = ({ index, style }) => {
-    return (
-      <div style={style}>{isItemLoaded(index) ? getRow(paginatedData[index]) : 'Loading...'}</div>
-    );
-  };
-
-  const itemCount = hasNextPage ? paginatedData.length + 1 : paginatedData.length;
   return (
     <div className={classNames(styles.table, className)}>
       <div className={styles.header}>
@@ -80,28 +67,23 @@ export default function DataTable({
           {metric}
         </div>
       </div>
-      <div className={styles.body} style={{ height }}>
+      <div className={styles.body} id="scrollableDiv" style={{ height }}>
         {data?.length === 0 && <NoData />}
         {virtualize && paginatedData.length > 0 ? (
-          <InfiniteLoader
-            itemCount={itemCount}
-            loadMoreItems={onLoadMoreItems}
-            isItemLoaded={isItemLoaded}
+          <InfiniteScroll
+            dataLength={paginatedData.length}
+            next={onLoadMoreItems}
+            hasMore={hasNextPage}
+            loader={<p>Loading…</p>}
+            endMessage={
+              !hasNextPage && <p style={{ textAlign: 'center' }}>You have reached the end.</p>
+            }
+            scrollableTarget="scrollableDiv"
           >
-            {({ onItemsRendered, ref }) => (
-              <FixedSizeList
-                height={height}
-                itemCount={paginatedData.length}
-                itemSize={30}
-                onItemsRendered={onItemsRendered}
-                ref={ref}
-              >
-                {Row}
-              </FixedSizeList>
-            )}
-          </InfiniteLoader>
+            {paginatedData.map(row => getRow(row))}
+          </InfiniteScroll>
         ) : (
-          paginatedData.map(row => getRow(row))
+          paginatedData.slice(0, 2).map(row => getRow(row))
         )}
       </div>
     </div>
