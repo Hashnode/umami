@@ -87,10 +87,6 @@ function MainContent({ data, websiteId }) {
       label: <FormattedMessage id="metrics.countries" defaultMessage="Countries" />,
       value: resolve({ view: 'country' }),
     },
-    {
-      label: <FormattedMessage id="metrics.events" defaultMessage="Events" />,
-      value: resolve({ view: 'event' }),
-    },
   ];
 
   const tableProps = {
