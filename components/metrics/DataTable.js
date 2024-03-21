@@ -83,7 +83,7 @@ export default function DataTable({
             {paginatedData.map(row => getRow(row))}
           </InfiniteScroll>
         ) : (
-          paginatedData.slice(0, 2).map(row => getRow(row))
+          paginatedData.map(row => getRow(row))
         )}
       </div>
     </div>
