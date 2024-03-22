@@ -12,6 +12,7 @@ import ErrorMessage from 'components/common/ErrorMessage';
 import FilterTags from 'components/metrics/FilterTags';
 import { getDateArray, getDateLength } from 'lib/date';
 import styles from './WebsiteChart.module.css';
+import useTimezone from 'hooks/useTimezone';
 
 export default function WebsiteChart({
   websiteId,
@@ -29,6 +30,7 @@ export default function WebsiteChart({
     resolve,
     query: { url, ref },
   } = usePageQuery();
+  const [timezone] = useTimezone();
 
   const { data, loading, error } = useFetch(
     `/api/gql/${domain}/pageviews`,
@@ -40,6 +42,7 @@ export default function WebsiteChart({
         ref,
         groupByUnit: unit,
         groupByValue: value,
+        tz: timezone,
       },
       onDataLoad,
     },

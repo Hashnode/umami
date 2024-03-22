@@ -6,7 +6,7 @@ import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref } = req.query;
+  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref, tz } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
@@ -16,14 +16,30 @@ export default async (req, res) => {
     groupByValue,
     url,
     ref,
+    timezone: tz,
   });
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit, url, ref }) {
+async function getAnalyticsData({
+  token,
+  domain,
+  startDate,
+  endDate,
+  groupByUnit,
+  url,
+  ref,
+  timezone,
+}) {
   try {
-    const from = new Date(parseInt(startDate)).toISOString();
-    const to = new Date(parseInt(endDate)).toISOString();
+    const fromWithTimezone = new Date(parseInt(startDate)).toLocaleString('en-US', {
+      timeZone: timezone,
+    });
+    const from = new Date(fromWithTimezone).toISOString();
+    const toWithTimezone = new Date(parseInt(endDate)).toLocaleString('en-US', {
+      timeZone: timezone,
+    });
+    const to = new Date(toWithTimezone).toISOString();
     const granularity = getGroupBy(groupByUnit);
     const filter = {
       time: {
