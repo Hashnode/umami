@@ -9,16 +9,14 @@ import { formatShortTime, formatNumber, formatLongNumber } from 'lib/format';
 import MetricCard from './MetricCard';
 import styles from './MetricsBar.module.css';
 import usePageQuery from 'hooks/usePageQuery';
-import useTimezone from 'hooks/useTimezone';
 
 export default function MetricsBar({ websiteId, className, domain }) {
   const [dateRange] = useDateRange(websiteId);
-  const { startDate, endDate, modified, unit, value } = dateRange;
+  const { startDate, endDate, modified, unit, value} = dateRange;
   const [format, setFormat] = useState(true);
   const {
     query: { url, ref },
   } = usePageQuery();
-  const [timezone] = useTimezone();
 
   const { data, error, loading } = useFetch(
     `/api/gql/${domain}/stats`,
@@ -28,9 +26,8 @@ export default function MetricsBar({ websiteId, className, domain }) {
         end_at: +endDate,
         url,
         ref,
-        groupByUnit: unit,
+        groupByUnit:  unit,
         groupByValue: value,
-        tz: timezone,
       },
     },
     [modified, url, ref],
@@ -48,7 +45,8 @@ export default function MetricsBar({ websiteId, className, domain }) {
   const pastViews = data?.data?.publication?.analytics?.pastViews?.edges[0]?.node;
   const visitors = data?.data?.publication?.analytics?.visitors?.edges[0]?.node;
   const pastVisitors = data?.data?.publication?.analytics?.pastVisitors?.edges[0]?.node;
-  const averageVisitTimeInSeconds = data?.data?.publication?.analytics?.averageVisitTimeInSeconds;
+  const averageVisitTimeInSeconds =
+    data?.data?.publication?.analytics?.averageVisitTimeInSeconds;
   const pastAverageVisitTimeInSeconds =
     data?.data?.publication?.analytics?.pastAverageVisitTimeInSeconds;
 

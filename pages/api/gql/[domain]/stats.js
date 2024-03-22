@@ -1,19 +1,17 @@
 import { parse } from 'cookie';
 import { differenceInDays, differenceInMinutes, sub } from 'date-fns';
-import { zonedTimeToUtc } from 'date-fns-tz';
 
 import { ok } from 'lib/response';
 import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref, tz } = req.query;
+  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
     startDate: start_at,
     endDate: end_at,
-    timezone: tz,
     groupByUnit,
     groupByValue,
     url,
@@ -22,19 +20,10 @@ export default async (req, res) => {
   return ok(res, data);
 };
 
-async function getAnalyticsData({
-  token,
-  domain,
-  startDate,
-  endDate,
-  groupByValue,
-  url,
-  ref,
-  timezone,
-}) {
+async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue, url, ref }) {
   try {
-    const from = zonedTimeToUtc(new Date(parseInt(startDate)), timezone),
-      to = zonedTimeToUtc(new Date(parseInt(endDate)), timezone);
+    const from = new Date(parseInt(startDate)),
+      to = new Date(parseInt(endDate));
     const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
     const pastFrom = sub(from, differenceKeyValuePair);
     const pastTo = from;
