@@ -75,7 +75,7 @@ async function getAnalyticsData({
       }),
     });
     const response = await data.json();
-    return mapData(response);
+    return mapData(response, timezone);
   } catch (error) {
     console.log('error', error);
   }
