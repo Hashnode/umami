@@ -60,7 +60,7 @@ async function getAnalyticsData({
         query,
         variables: {
           host: domain,
-          first: 50,
+          first: 100,
           filter: filter,
           visitorsFilter: filter,
           groupBy: {
