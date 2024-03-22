@@ -36,6 +36,8 @@ export default function WebsiteChart({
       params: {
         start_at: +startDate,
         end_at: +endDate,
+        url,
+        ref,
         groupByUnit: unit,
         groupByValue: value,
       },

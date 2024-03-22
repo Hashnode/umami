@@ -6,7 +6,7 @@ import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, groupByUnit, groupByValue } = req.query;
+  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
@@ -14,15 +14,31 @@ export default async (req, res) => {
     endDate: end_at,
     groupByUnit,
     groupByValue,
+    url,
+    ref,
   });
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit }) {
+async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit, url, ref }) {
   try {
     const from = new Date(parseInt(startDate)).toISOString();
     const to = new Date(parseInt(endDate)).toISOString();
     const granularity = getGroupBy(groupByUnit);
+    const filter = {
+      time: {
+        absolute: {
+          from,
+          to,
+        },
+      },
+    };
+    if (url) {
+      filter.paths = [url];
+    }
+    if (ref) {
+      filter.referrerHosts = [ref];
+    }
     const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
@@ -34,22 +50,8 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByUnit
         variables: {
           host: domain,
           first: 50,
-          filter: {
-            time: {
-              absolute: {
-                from,
-                to,
-              },
-            },
-          },
-          visitorsFilter: {
-            time: {
-              absolute: {
-                from,
-                to,
-              },
-            },
-          },
+          filter: filter,
+          visitorsFilter: filter,
           groupBy: {
             granularity,
           },
