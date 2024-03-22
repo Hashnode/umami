@@ -1,6 +1,6 @@
 import { parse } from 'cookie';
 import { format } from 'date-fns';
-import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz';
+import { utcToZonedTime } from 'date-fns-tz';
 
 import { ok } from 'lib/response';
 import { getGQLUrl } from 'utils/urls';
@@ -33,10 +33,8 @@ async function getAnalyticsData({
   timezone,
 }) {
   try {
-    const fromWithTimezone = zonedTimeToUtc(new Date(parseInt(startDate)), timezone);
-    const from = new Date(fromWithTimezone).toISOString();
-    const toWithTimezone = zonedTimeToUtc(new Date(parseInt(endDate)), timezone);
-    const to = new Date(toWithTimezone).toISOString();
+    const from = new Date(parseInt(startDate)).toISOString();
+    const to = new Date(parseInt(endDate)).toISOString();
     const granularity = getGroupBy(groupByUnit);
     const filter = {
       time: {
