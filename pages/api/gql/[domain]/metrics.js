@@ -1,11 +1,12 @@
 import { parse } from 'cookie';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 import { ok } from 'lib/response';
 import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, type, limit, cursor } = req.query;
+  const { start_at, end_at, domain, type, limit, cursor, tz } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
     domain,
@@ -14,14 +15,24 @@ export default async (req, res) => {
     cursor,
     startDate: start_at,
     endDate: end_at,
+    timezone: tz,
   });
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, type, limit, cursor, domain, startDate, endDate }) {
+async function getAnalyticsData({
+  token,
+  type,
+  limit,
+  cursor,
+  domain,
+  startDate,
+  endDate,
+  timezone,
+}) {
   try {
-    const from = new Date(parseInt(startDate)).toISOString();
-    const to = new Date(parseInt(endDate)).toISOString();
+    const from = zonedTimeToUtc(new Date(parseInt(startDate)), timezone).toISOString();
+    const to = zonedTimeToUtc(new Date(parseInt(endDate)), timezone).toISOString();
     const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {

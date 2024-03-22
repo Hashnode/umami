@@ -15,6 +15,7 @@ import styles from './MetricsTable.module.css';
 import { get } from 'lib/web';
 import { useRouter } from 'next/router';
 import { percentFilter } from 'lib/filters';
+import useTimezone from 'hooks/useTimezone';
 
 export default function MetricsTable({
   websiteId,
@@ -31,6 +32,7 @@ export default function MetricsTable({
   const [dateRange] = useDateRange(websiteId);
   const { basePath } = useRouter();
   const { startDate, endDate, modified } = dateRange;
+  const [timezone] = useTimezone();
   const {
     resolve,
     router,
@@ -44,6 +46,7 @@ export default function MetricsTable({
         start_at: +startDate,
         end_at: +endDate,
         limit: limit || 10,
+        tz: timezone,
       },
       onDataLoad,
       delay: DEFAULT_ANIMATION_DURATION,
@@ -61,6 +64,7 @@ export default function MetricsTable({
           end_at: +endDate,
           limit: limit || 10,
           cursor: endCursor,
+          tz: timezone,
         },
         {
           'Content-Type': 'application/json',
