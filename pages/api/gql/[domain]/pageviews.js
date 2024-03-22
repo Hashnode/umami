@@ -1,6 +1,6 @@
 import { parse } from 'cookie';
 import { format } from 'date-fns';
-import { utcToZonedTime } from 'date-fns-tz';
+import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz';
 
 import { ok } from 'lib/response';
 import { getGQLUrl } from 'utils/urls';
@@ -33,9 +33,9 @@ async function getAnalyticsData({
   timezone,
 }) {
   try {
-    const fromWithTimezone = utcToZonedTime(new Date(parseInt(startDate)), timezone);
+    const fromWithTimezone = zonedTimeToUtc(new Date(parseInt(startDate)), timezone);
     const from = new Date(fromWithTimezone).toISOString();
-    const toWithTimezone = utcToZonedTime(new Date(parseInt(endDate)), timezone);
+    const toWithTimezone = zonedTimeToUtc(new Date(parseInt(endDate)), timezone);
     const to = new Date(toWithTimezone).toISOString();
     const granularity = getGroupBy(groupByUnit);
     const filter = {
@@ -143,13 +143,13 @@ const query = /* GraphQL */ `
   }
 `;
 
-const mapData = data => {
+const mapData = (data, timezone) => {
   const pageviews = data?.data?.publication?.analytics?.views?.edges.map(item => ({
-    t: format(new Date(item.node.to), 'yyyy-MM-dd HH:mm:ss'),
+    t: format(utcToZonedTime(new Date(item.node.to), timezone), 'yyyy-MM-dd HH:mm:ss'),
     y: item.node.total,
   }));
   const sessions = data?.data?.publication?.analytics?.visitors?.edges.map(item => ({
-    t: format(new Date(item.node.to), 'yyyy-MM-dd HH:mm:ss'),
+    t: format(utcToZonedTime(new Date(item.node.to), timezone), 'yyyy-MM-dd HH:mm:ss'),
     y: item.node.total,
   }));
   return {
