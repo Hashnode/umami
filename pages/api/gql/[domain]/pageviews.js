@@ -50,6 +50,25 @@ async function getAnalyticsData({
     if (ref) {
       filter.referrerHosts = [ref];
     }
+    const variables = {
+      host: domain,
+      first: 100,
+      filter,
+      groupBy: {
+        granularity,
+      },
+      options: {
+        responseTimezone: timezone,
+      },
+      visitorsFilter: filter,
+      visitorsGroupBy: {
+        granularity,
+      },
+      visitorsOptions: {
+        responseTimezone: timezone,
+      },
+    };
+
     const data = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
@@ -58,18 +77,7 @@ async function getAnalyticsData({
       },
       body: JSON.stringify({
         query,
-        variables: {
-          host: domain,
-          first: 100,
-          filter: filter,
-          visitorsFilter: filter,
-          groupBy: {
-            granularity,
-          },
-          visitorsGroupBy: {
-            granularity,
-          },
-        },
+        variables,
       }),
     });
     const response = await data.json();
@@ -104,11 +112,13 @@ const query = /* GraphQL */ `
     $visitorsFilter: PublicationVisitorsFilter
     $groupBy: PublicationViewsGroupBy
     $visitorsGroupBy: PublicationVisitorsGroupBy
+    $options: PublicationViewsOptions
+    $visitorsOptions: PublicationVisitorsOptions
   ) {
     publication(host: $host) {
       url
       analytics {
-        views(first: $first, filter: $filter, groupBy: $groupBy) {
+        views(first: $first, filter: $filter, groupBy: $groupBy, options: $options) {
           edges {
             node {
               id
@@ -122,7 +132,12 @@ const query = /* GraphQL */ `
             }
           }
         }
-        visitors(first: $first, filter: $visitorsFilter, groupBy: $visitorsGroupBy) {
+        visitors(
+          first: $first
+          filter: $visitorsFilter
+          groupBy: $visitorsGroupBy
+          options: $visitorsOptions
+        ) {
           edges {
             node {
               id
