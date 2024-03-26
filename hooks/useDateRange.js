@@ -7,10 +7,10 @@ import { DATE_RANGE_CONFIG, DEFAULT_DATE_RANGE } from 'lib/constants';
 import useForceUpdate from './useForceUpdate';
 import useLocale from './useLocale';
 
-export default function useDateRange(websiteId, defaultDateRange = DEFAULT_DATE_RANGE) {
+export default function useDateRange(publicationId, defaultDateRange = DEFAULT_DATE_RANGE) {
   const dispatch = useDispatch();
   const { locale } = useLocale();
-  const dateRange = useSelector(state => state.websites[websiteId]?.dateRange);
+  const dateRange = useSelector(state => state.websites[publicationId]?.dateRange);
   const forceUpdate = useForceUpdate();
 
   const globalDefault = getItem(DATE_RANGE_CONFIG);
@@ -31,8 +31,8 @@ export default function useDateRange(websiteId, defaultDateRange = DEFAULT_DATE_
   function saveDateRange(values) {
     const { value } = values;
 
-    if (websiteId) {
-      dispatch(setDateRange(websiteId, values));
+    if (publicationId) {
+      dispatch(setDateRange(publicationId, values));
     } else {
       setItem(DATE_RANGE_CONFIG, value === 'custom' ? values : value);
       forceUpdate();

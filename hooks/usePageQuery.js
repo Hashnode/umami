@@ -4,7 +4,7 @@ import { getQueryString } from 'lib/url';
 
 export default function usePageQuery() {
   const router = useRouter();
-  const { pathname, search } = location;
+  const { pathname, search } = typeof location !== 'undefined' ? location : {};
 
   const query = useMemo(() => {
     if (!search) {

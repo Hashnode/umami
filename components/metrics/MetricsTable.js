@@ -17,8 +17,7 @@ import { useRouter } from 'next/router';
 import { percentFilter } from 'lib/filters';
 
 export default function MetricsTable({
-  websiteId,
-  websiteDomain,
+  publicationId,
   type,
   className,
   dataFilter,
@@ -28,7 +27,7 @@ export default function MetricsTable({
   virtualize,
   ...props
 }) {
-  const [dateRange] = useDateRange(websiteId);
+  const [dateRange] = useDateRange(publicationId);
   const { basePath } = useRouter();
   const { startDate, endDate, modified } = dateRange;
   const {
@@ -37,7 +36,7 @@ export default function MetricsTable({
     query: { url, ref },
   } = usePageQuery();
   const { data, loading, error } = useFetch(
-    `/api/gql/${websiteDomain}/metrics`,
+    `/api/gql/${publicationId}/metrics`,
     {
       params: {
         type,
@@ -54,7 +53,7 @@ export default function MetricsTable({
   async function fetchMoreItems(endCursor) {
     try {
       const { data } = await get(
-        `${basePath}/api/gql/${websiteDomain}/metrics`,
+        `${basePath}/api/gql/${publicationId}/metrics`,
         {
           type,
           start_at: +startDate,

@@ -6,10 +6,10 @@ import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref } = req.query;
+  const { start_at, end_at, publicationId, groupByUnit, groupByValue, url, ref } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
-    domain,
+    publicationId,
     startDate: start_at,
     endDate: end_at,
     groupByUnit,
@@ -20,7 +20,15 @@ export default async (req, res) => {
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, domain, startDate, endDate, groupByValue, url, ref }) {
+async function getAnalyticsData({
+  token,
+  publicationId,
+  startDate,
+  endDate,
+  groupByValue,
+  url,
+  ref,
+}) {
   try {
     const from = new Date(parseInt(startDate)),
       to = new Date(parseInt(endDate));
@@ -60,7 +68,7 @@ async function getAnalyticsData({ token, domain, startDate, endDate, groupByValu
       body: JSON.stringify({
         query,
         variables: {
-          host: domain,
+          id: publicationId,
           first: 1,
           filter: presentFilter,
           pastFilter: pastFilter,
@@ -123,7 +131,7 @@ function getDifferenceKeyValuePair(unit, from, to) {
 
 const query = /* GraphQL */ `
   query Stats(
-    $host: String
+    $id: ObjectId
     $first: Int!
     $filter: PublicationViewsFilter
     $pastFilter: PublicationViewsFilter
@@ -132,7 +140,7 @@ const query = /* GraphQL */ `
     $averageVisitTimeFilter: AverageVisitTimeFilter
     $pastAverageVisitTimeFilter: AverageVisitTimeFilter
   ) {
-    publication(host: $host) {
+    publication(id: $id) {
       url
       analytics {
         views(first: $first, filter: $filter) {

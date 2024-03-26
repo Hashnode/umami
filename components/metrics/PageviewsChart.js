@@ -7,7 +7,7 @@ import useTheme from 'hooks/useTheme';
 import { THEME_COLORS, DEFAULT_ANIMATION_DURATION } from 'lib/constants';
 
 export default function PageviewsChart({
-  websiteId,
+  publicationId,
   data,
   unit,
   records,
@@ -57,7 +57,7 @@ export default function PageviewsChart({
         <BarChart
           {...props}
           className={className}
-          chartId={websiteId}
+          chartId={publicationId}
           datasets={[
             {
               label: intl.formatMessage({

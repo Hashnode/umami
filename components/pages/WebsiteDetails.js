@@ -16,10 +16,8 @@ import BrowsersTable from '../metrics/BrowsersTable';
 import OSTable from '../metrics/OSTable';
 import DevicesTable from '../metrics/DevicesTable';
 import CountriesTable from '../metrics/CountriesTable';
-import useFetch from 'hooks/useFetch';
 import usePageQuery from 'hooks/usePageQuery';
-import useShareToken from 'hooks/useShareToken';
-import { DEFAULT_ANIMATION_DURATION, TOKEN_HEADER } from 'lib/constants';
+import { DEFAULT_ANIMATION_DURATION } from 'lib/constants';
 
 const views = {
   url: PagesTable,
@@ -30,20 +28,11 @@ const views = {
   country: CountriesTable,
 };
 
-export default function WebsiteDetails({ websiteId }) {
-  const shareToken = useShareToken();
-  const { data } = useFetch(`/api/website/${websiteId}`, {
-    headers: { [TOKEN_HEADER]: shareToken?.token },
-  });
-
-  if (!data) {
-    return null;
-  }
-
-  return <MainContent data={data} websiteId={websiteId} />;
+export default function WebsiteDetails({ publication }) {
+  return <MainContent publication={publication} />;
 }
 
-function MainContent({ data, websiteId }) {
+function MainContent({ publication }) {
   const [chartLoaded, setChartLoaded] = useState(false);
   const [countryData, setCountryData] = useState();
   const {
@@ -90,8 +79,8 @@ function MainContent({ data, websiteId }) {
   ];
 
   const tableProps = {
-    websiteId,
-    websiteDomain: data?.domain,
+    publicationId: publication._id,
+    websiteDomain: publication.url,
     limit: 10,
     virtualize: false,
   };
@@ -109,9 +98,8 @@ function MainContent({ data, websiteId }) {
       <div className="row">
         <div className={classNames(styles.chart, 'col')}>
           <WebsiteChart
-            websiteId={websiteId}
-            title={data.name}
-            domain={data.domain}
+            publicationId={publication._id}
+            title={publication.title}
             onDataLoad={handleDataLoad}
             showLink={false}
             stickyHeader
