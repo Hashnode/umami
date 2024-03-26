@@ -90,7 +90,7 @@ function DateFilter({ value, startDate, endDate, onChange, className }) {
           <DatePickerForm
             startDate={startDate}
             endDate={endDate}
-            minDate={new Date(2000, 0, 1)}
+            minDate={new Date(2015, 0, 1)}
             maxDate={endOfYear(new Date())}
             onChange={handlePickerChange}
             onClose={() => setShowPicker(false)}
