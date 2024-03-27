@@ -90,14 +90,14 @@ export const getServerSideProps = async ctx => {
       };
     }
     const publication = await getPublicationDetailsFromUmami(umamiShareId);
-    if (!publication) {
+    if (!publication || !publication._id) {
       return {
         notFound: true,
       };
     }
     return {
       redirect: {
-        destination: `/share/${publication.id}`,
+        destination: `/share/${publication._id}`,
         permanent: true,
       },
     };
