@@ -79,7 +79,7 @@ function MainContent({ publication }) {
   ];
 
   const tableProps = {
-    publicationId: publication._id,
+    publicationId: publication.id,
     websiteDomain: publication.url,
     limit: 10,
     virtualize: false,
@@ -98,7 +98,7 @@ function MainContent({ publication }) {
       <div className="row">
         <div className={classNames(styles.chart, 'col')}>
           <WebsiteChart
-            publicationId={publication._id}
+            publicationId={publication.id}
             title={publication.title}
             onDataLoad={handleDataLoad}
             showLink={false}
