@@ -58,18 +58,18 @@ async function getAnalyticsData({
         granularity,
       },
       options: {
-        responseTimezone: timezone,
+        groupingTimezone: timezone,
       },
       visitorsFilter: filter,
       visitorsGroupBy: {
         granularity,
       },
       visitorsOptions: {
-        responseTimezone: timezone,
+        groupingTimezone: timezone,
       },
     };
 
-    const data = await fetch(getGQLUrl(), {
+    const response = await fetch(getGQLUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,8 +80,16 @@ async function getAnalyticsData({
         variables,
       }),
     });
-    const response = await data.json();
-    return mapData(response, timezone);
+    if (!response.ok) {
+      console.error('HTTP-Error:', response.status);
+      throw new Error('HTTP-Error');
+    }
+    const responseBody = await response.json();
+    if (responseBody.errors) {
+      console.error('Response contained errors:', responseBody.errors);
+      throw new Error('Response contained errors');
+    }
+    return mapData(responseBody.data, timezone);
   } catch (error) {
     console.log('error', error);
   }
@@ -157,11 +165,12 @@ const query = /* GraphQL */ `
 `;
 
 const mapData = (data, timezone) => {
-  const pageviews = data?.data?.publication?.analytics?.views?.edges.map(item => ({
+  const pageviews = data?.publication?.analytics?.views?.edges.map(item => ({
+    // dates are in UTC, if omitting timezone information we have to transform them to the desired timezone first
     t: format(utcToZonedTime(new Date(item.node.to), timezone), 'yyyy-MM-dd HH:mm:ss'),
     y: item.node.total,
   }));
-  const sessions = data?.data?.publication?.analytics?.visitors?.edges.map(item => ({
+  const sessions = data?.publication?.analytics?.visitors?.edges.map(item => ({
     t: format(utcToZonedTime(new Date(item.node.to), timezone), 'yyyy-MM-dd HH:mm:ss'),
     y: item.node.total,
   }));
