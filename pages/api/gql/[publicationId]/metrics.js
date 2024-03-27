@@ -5,10 +5,10 @@ import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, type, limit, cursor } = req.query;
+  const { start_at, end_at, publicationId, type, limit, cursor } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
-    domain,
+    publicationId,
     type,
     limit,
     cursor,
@@ -18,7 +18,7 @@ export default async (req, res) => {
   return ok(res, data);
 };
 
-async function getAnalyticsData({ token, type, limit, cursor, domain, startDate, endDate }) {
+async function getAnalyticsData({ token, type, limit, cursor, publicationId, startDate, endDate }) {
   try {
     const from = new Date(parseInt(startDate)).toISOString();
     const to = new Date(parseInt(endDate)).toISOString();
@@ -31,7 +31,7 @@ async function getAnalyticsData({ token, type, limit, cursor, domain, startDate,
       body: JSON.stringify({
         query: getQuery(type),
         variables: {
-          host: domain,
+          id: publicationId,
           first: parseInt(limit || 10),
           after: cursor || null,
           filter: {
@@ -57,12 +57,12 @@ function getQuery(type) {
     case 'device':
       return /* GraphQL */ `
         query MetricsPerDevice(
-          $host: String
+          $id: ObjectId
           $first: Int!
           $after: String
           $filter: PublicationVisitorsFilter
         ) {
-          publication(host: $host) {
+          publication(id: $id) {
             url
             analytics {
               totalViews: visitors(first: $first, filter: $filter) {
@@ -99,12 +99,12 @@ function getQuery(type) {
     case 'browser':
       return /* GraphQL */ `
         query MetricsPerBrowser(
-          $host: String
+          $id: ObjectId
           $first: Int!
           $after: String
           $filter: PublicationVisitorsFilter
         ) {
-          publication(host: $host) {
+          publication(id: $id) {
             url
             analytics {
               totalViews: visitors(first: $first, filter: $filter) {
@@ -141,12 +141,12 @@ function getQuery(type) {
     case 'os':
       return /* GraphQL */ `
         query MetricsPerOS(
-          $host: String
+          $id: ObjectId
           $first: Int!
           $after: String
           $filter: PublicationVisitorsFilter
         ) {
-          publication(host: $host) {
+          publication(id: $id) {
             url
             analytics {
               totalViews: visitors(first: $first, filter: $filter) {
@@ -183,12 +183,12 @@ function getQuery(type) {
     case 'country':
       return /* GraphQL */ `
         query MetricsPerCountry(
-          $host: String
+          $id: ObjectId
           $first: Int!
           $after: String
           $filter: PublicationVisitorsFilter
         ) {
-          publication(host: $host) {
+          publication(id: $id) {
             url
             analytics {
               totalViews: visitors(first: $first, filter: $filter) {
@@ -225,12 +225,12 @@ function getQuery(type) {
     case 'referrer':
       return /* GraphQL */ `
         query MetricsPerReferrer(
-          $host: String
+          $id: ObjectId
           $first: Int!
           $after: String
           $filter: PublicationViewsFilter
         ) {
-          publication(host: $host) {
+          publication(id: $id) {
             url
             analytics {
               totalViews: views(first: $first, filter: $filter) {
@@ -267,12 +267,12 @@ function getQuery(type) {
     case 'url':
       return /* GraphQL */ `
         query MetricsPerPath(
-          $host: String
+          $id: ObjectId
           $first: Int!
           $after: String
           $filter: PublicationViewsFilter
         ) {
-          publication(host: $host) {
+          publication(id: $id) {
             url
             analytics {
               totalViews: views(first: $first, filter: $filter) {
@@ -308,8 +308,8 @@ function getQuery(type) {
       `;
     default:
       return /* GraphQL */ `
-        query Stats($host: String, $first: Int!, $filter: PublicationViewsFilter) {
-          publication(host: $host) {
+        query Stats($id: ObjectId, $first: Int!, $filter: PublicationViewsFilter) {
+          publication(id: $id) {
             url
             analytics {
               views(first: $first, filter: $filter) {

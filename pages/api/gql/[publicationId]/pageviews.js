@@ -7,10 +7,10 @@ import { getGQLUrl } from 'utils/urls';
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
   const jwtToken = parse(req.headers.cookie || '')['jwt'];
-  const { start_at, end_at, domain, groupByUnit, groupByValue, url, ref, tz } = req.query;
+  const { start_at, end_at, publicationId, groupByUnit, groupByValue, url, ref, tz } = req.query;
   const data = await getAnalyticsData({
     token: jwtToken,
-    domain,
+    publicationId,
     startDate: start_at,
     endDate: end_at,
     groupByUnit,
@@ -24,7 +24,7 @@ export default async (req, res) => {
 
 async function getAnalyticsData({
   token,
-  domain,
+  publicationId,
   startDate,
   endDate,
   groupByUnit,
@@ -51,7 +51,7 @@ async function getAnalyticsData({
       filter.referrerHosts = [ref];
     }
     const variables = {
-      host: domain,
+      id: publicationId,
       first: 100,
       filter,
       groupBy: {
@@ -114,7 +114,7 @@ function getGroupBy(unit) {
 
 const query = /* GraphQL */ `
   query Pageviews(
-    $host: String
+    $id: ObjectId
     $first: Int!
     $filter: PublicationViewsFilter
     $visitorsFilter: PublicationVisitorsFilter
@@ -123,7 +123,7 @@ const query = /* GraphQL */ `
     $options: PublicationViewsOptions
     $visitorsOptions: PublicationVisitorsOptions
   ) {
-    publication(host: $host) {
+    publication(id: $id) {
       url
       analytics {
         views(first: $first, filter: $filter, groupBy: $groupBy, options: $options) {

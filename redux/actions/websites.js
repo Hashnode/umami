@@ -9,8 +9,8 @@ const websites = createSlice({
       return state;
     },
     updateWebsite(state, action) {
-      const { websiteId, ...data } = action.payload;
-      state[websiteId] = data;
+      const { publicationId, ...data } = action.payload;
+      state[publicationId] = data;
       return state;
     },
   },
@@ -20,10 +20,10 @@ export const { updateWebsites, updateWebsite } = websites.actions;
 
 export default websites.reducer;
 
-export function setDateRange(websiteId, dateRange) {
+export function setDateRange(publicationId, dateRange) {
   return dispatch => {
     return dispatch(
-      updateWebsite({ websiteId, dateRange: { ...dateRange, modified: Date.now() } }),
+      updateWebsite({ publicationId, dateRange: { ...dateRange, modified: Date.now() } }),
     );
   };
 }

@@ -15,7 +15,7 @@ export default function Footer() {
       <div className={classNames(styles.footer, 'row')}>
         <div className="col-12 col-md-4" />
         <div className="col-12 col-md-4">
-          &copy; {new Date().getFullYear()} Hashnode. Powered by{' '}
+          &copy; {new Date().getFullYear()} Hashnode. UI powered by{' '}
           <Link href={`https://github.com/mikecao/umami/releases`}>Umami</Link>
           {/* <FormattedMessage
             id="message.powered-by"
