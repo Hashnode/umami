@@ -52,6 +52,13 @@ async function getPublicationDetailsFromGQL(publicationId) {
                 name
               }
               displayTitle
+              preferences {
+              logo
+              darkMode {
+                logo
+                enabled
+              }
+            }
             }
           }
         `,
