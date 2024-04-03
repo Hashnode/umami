@@ -118,9 +118,9 @@ export const getServerSideProps = async ctx => {
     };
   }
 
-  const title = `${
+  const title = `Analytics for ${
     publication.displayTitle || publication.title || `${publication.author.name}'s Blog`
-  } Analytics`;
+  }`;
   const description = publication.descriptionSEO || publication.title;
   const ogImage = publication.ogImage?.image
     ? `https://hashnode.com/utility/r?url=${encodeURIComponent(
