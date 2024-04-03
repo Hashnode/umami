@@ -42,7 +42,7 @@ const commandlineOptions = {
 };
 
 const options = {
-  url: 'http://localhost:3000',
+  url: 'http://localhost:3001',
   method: 'POST',
   concurrency: 5,
   requestsPerSecond: 5,

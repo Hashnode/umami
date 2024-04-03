@@ -3,14 +3,14 @@ import MetricsTable from './MetricsTable';
 import { FormattedMessage } from 'react-intl';
 import { getDeviceMessage } from 'components/messages';
 
-export default function DevicesTable({ websiteId, ...props }) {
+export default function DevicesTable({ publicationId, ...props }) {
   return (
     <MetricsTable
       {...props}
       title={<FormattedMessage id="metrics.devices" defaultMessage="Devices" />}
       type="device"
       metric={<FormattedMessage id="metrics.visitors" defaultMessage="Visitors" />}
-      websiteId={websiteId}
+      publicationId={publicationId}
       renderLabel={({ x }) => getDeviceMessage(x)}
     />
   );

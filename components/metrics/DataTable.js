@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { FixedSizeList } from 'react-window';
+import React, { useEffect, useState } from 'react';
 import { useSpring, animated, config } from 'react-spring';
 import classNames from 'classnames';
 import { FormattedMessage } from 'react-intl';
 import NoData from 'components/common/NoData';
 import { formatNumber, formatLongNumber } from 'lib/format';
 import styles from './DataTable.module.css';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function DataTable({
   data,
@@ -15,12 +15,29 @@ export default function DataTable({
   renderLabel,
   height,
   animate = true,
+  fetchMoreItems,
   virtualize = false,
+  limit = 10,
 }) {
+  const [paginatedData, setPaginatedData] = useState(data);
+  const [hasNextPage, setHasNextPage] = useState(data.length === limit);
   const [format, setFormat] = useState(true);
   const formatFunc = format ? formatLongNumber : formatNumber;
-
   const handleSetFormat = () => setFormat(state => !state);
+
+  const onLoadMoreItems = async () => {
+    if (paginatedData.length === 0 || !hasNextPage) return;
+    const endCursor = paginatedData[paginatedData.length - 1].cursor;
+    if (!endCursor) return;
+    const data = await fetchMoreItems(endCursor);
+    setHasNextPage(data.length === limit);
+    setPaginatedData(prevData => [...prevData, ...data]);
+  };
+
+  useEffect(() => {
+    setHasNextPage(data.length === limit);
+    setPaginatedData(data);
+  }, [data, limit]);
 
   const getRow = row => {
     const { x: label, y: value, z: percent } = row;
@@ -42,10 +59,6 @@ export default function DataTable({
     );
   };
 
-  const Row = ({ index, style }) => {
-    return <div style={style}>{getRow(data[index])}</div>;
-  };
-
   return (
     <div className={classNames(styles.table, className)}>
       <div className={styles.header}>
@@ -54,14 +67,23 @@ export default function DataTable({
           {metric}
         </div>
       </div>
-      <div className={styles.body} style={{ height }}>
+      <div className={styles.body} id="scrollableDiv" style={{ height }}>
         {data?.length === 0 && <NoData />}
-        {virtualize && data.length > 0 ? (
-          <FixedSizeList height={height} itemCount={data.length} itemSize={30}>
-            {Row}
-          </FixedSizeList>
+        {virtualize && paginatedData.length > 0 ? (
+          <InfiniteScroll
+            dataLength={paginatedData.length}
+            next={onLoadMoreItems}
+            hasMore={hasNextPage}
+            loader={<p>Loading…</p>}
+            endMessage={
+              !hasNextPage && <p style={{ textAlign: 'center' }}>You have reached the end.</p>
+            }
+            scrollableTarget="scrollableDiv"
+          >
+            {paginatedData.map(row => getRow(row))}
+          </InfiniteScroll>
         ) : (
-          data.map(row => getRow(row))
+          paginatedData.map(row => getRow(row))
         )}
       </div>
     </div>

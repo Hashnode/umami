@@ -5,32 +5,30 @@ import Loading from 'components/common/Loading';
 import ErrorMessage from 'components/common/ErrorMessage';
 import useFetch from 'hooks/useFetch';
 import useDateRange from 'hooks/useDateRange';
-import usePageQuery from 'hooks/usePageQuery';
-import useShareToken from 'hooks/useShareToken';
 import { formatShortTime, formatNumber, formatLongNumber } from 'lib/format';
-import { TOKEN_HEADER } from 'lib/constants';
 import MetricCard from './MetricCard';
 import styles from './MetricsBar.module.css';
+import usePageQuery from 'hooks/usePageQuery';
 
-export default function MetricsBar({ websiteId, className }) {
-  const shareToken = useShareToken();
-  const [dateRange] = useDateRange(websiteId);
-  const { startDate, endDate, modified } = dateRange;
+export default function MetricsBar({ publicationId, className }) {
+  const [dateRange] = useDateRange(publicationId);
+  const { startDate, endDate, modified, unit, value } = dateRange;
   const [format, setFormat] = useState(true);
   const {
     query: { url, ref },
   } = usePageQuery();
 
   const { data, error, loading } = useFetch(
-    `/api/website/${websiteId}/stats`,
+    `/api/gql/${publicationId}/stats`,
     {
       params: {
         start_at: +startDate,
         end_at: +endDate,
         url,
         ref,
+        groupByUnit: unit,
+        groupByValue: value,
       },
-      headers: { [TOKEN_HEADER]: shareToken?.token },
     },
     [modified, url, ref],
   );
@@ -43,14 +41,13 @@ export default function MetricsBar({ websiteId, className }) {
     setFormat(state => !state);
   }
 
-  const { pageviews, uniques, bounces, totaltime } = data || {};
-  //const num = Math.min(data && uniques.value, data && bounces.value);
-  const diffs = data && {
-    pageviews: pageviews.value - pageviews.change,
-    uniques: uniques.value - uniques.change,
-    bounces: bounces.value - bounces.change,
-    totaltime: totaltime.value - totaltime.change,
-  };
+  const views = data?.data?.publication?.analytics?.views?.edges[0]?.node;
+  const pastViews = data?.data?.publication?.analytics?.pastViews?.edges[0]?.node;
+  const visitors = data?.data?.publication?.analytics?.visitors?.edges[0]?.node;
+  const pastVisitors = data?.data?.publication?.analytics?.pastVisitors?.edges[0]?.node;
+  const averageVisitTimeInSeconds = data?.data?.publication?.analytics?.averageVisitTimeInSeconds;
+  const pastAverageVisitTimeInSeconds =
+    data?.data?.publication?.analytics?.pastAverageVisitTimeInSeconds;
 
   return (
     <div className={classNames(styles.bar, className)} onClick={handleSetFormat}>
@@ -60,14 +57,14 @@ export default function MetricsBar({ websiteId, className }) {
         <>
           <MetricCard
             label={<FormattedMessage id="metrics.views" defaultMessage="Views" />}
-            value={pageviews.value}
-            change={pageviews.change}
+            value={views?.total || 0}
+            change={(views?.total || 0) - (pastViews?.total || 0)}
             format={formatFunc}
           />
           <MetricCard
             label={<FormattedMessage id="metrics.visitors" defaultMessage="Visitors" />}
-            value={uniques.value}
-            change={uniques.change}
+            value={visitors?.total || 0}
+            change={(visitors?.total || 0) - (pastVisitors?.total || 0)}
             format={formatFunc}
           />
           {/* <MetricCard
@@ -89,18 +86,8 @@ export default function MetricsBar({ websiteId, className }) {
                 defaultMessage="Average visit time"
               />
             }
-            value={
-              totaltime.value && pageviews.value
-                ? totaltime.value / (pageviews.value - bounces.value)
-                : 0
-            }
-            change={
-              totaltime.value && pageviews.value
-                ? (diffs.totaltime / (diffs.pageviews - diffs.bounces) -
-                    totaltime.value / (pageviews.value - bounces.value)) *
-                    -1 || 0
-                : 0
-            }
+            value={averageVisitTimeInSeconds}
+            change={averageVisitTimeInSeconds - pastAverageVisitTimeInSeconds}
             format={n => `${n < 0 ? '-' : ''}${formatShortTime(Math.abs(~~n), ['m', 's'], ' ')}`}
           />
         </>

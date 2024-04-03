@@ -12,7 +12,7 @@ import styles from './PagesTable.module.css';
 export const FILTER_COMBINED = 0;
 export const FILTER_RAW = 1;
 
-export default function PagesTable({ websiteId, websiteDomain, showFilters, ...props }) {
+export default function PagesTable({ publicationId, websiteDomain, showFilters, ...props }) {
   const [filter, setFilter] = useState(FILTER_COMBINED);
   const {
     resolve,
@@ -49,7 +49,7 @@ export default function PagesTable({ websiteId, websiteDomain, showFilters, ...p
         title={<FormattedMessage id="metrics.pages" defaultMessage="Pages" />}
         type="url"
         metric={<FormattedMessage id="metrics.views" defaultMessage="Views" />}
-        websiteId={websiteId}
+        publicationId={publicationId}
         dataFilter={urlFilter}
         filterOptions={{ domain: websiteDomain, raw: filter === FILTER_RAW }}
         renderLabel={renderLink}

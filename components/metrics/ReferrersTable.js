@@ -15,7 +15,7 @@ export const FILTER_DOMAIN_ONLY = 0;
 export const FILTER_COMBINED = 1;
 export const FILTER_RAW = 2;
 
-export default function ReferrersTable({ websiteId, websiteDomain, showFilters, ...props }) {
+export default function ReferrersTable({ publicationId, websiteDomain, showFilters, ...props }) {
   const [filter, setFilter] = useState(FILTER_COMBINED);
   const {
     resolve,
@@ -35,7 +35,6 @@ export default function ReferrersTable({ websiteId, websiteDomain, showFilters, 
   ];
 
   const renderLink = ({ w: link, x: label }) => {
-    console.log({ link, label });
     return (
       <div className={styles.row}>
         <Link href={resolve({ ref: label })} replace={true}>
@@ -63,7 +62,7 @@ export default function ReferrersTable({ websiteId, websiteDomain, showFilters, 
         title={<FormattedMessage id="metrics.referrers" defaultMessage="Referrers" />}
         type="referrer"
         metric={<FormattedMessage id="metrics.views" defaultMessage="Views" />}
-        websiteId={websiteId}
+        publicationId={publicationId}
         dataFilter={refFilter}
         filterOptions={{
           domain: websiteDomain,

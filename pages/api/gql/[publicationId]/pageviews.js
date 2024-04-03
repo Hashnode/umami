@@ -1,0 +1,181 @@
+import { parse } from 'cookie';
+import { format } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
+
+import { ok } from 'lib/response';
+import { getGQLUrl } from 'utils/urls';
+// eslint-disable-next-line import/no-anonymous-default-export
+export default async (req, res) => {
+  const jwtToken = parse(req.headers.cookie || '')['jwt'];
+  const { start_at, end_at, publicationId, groupByUnit, groupByValue, url, ref, tz } = req.query;
+  const data = await getAnalyticsData({
+    token: jwtToken,
+    publicationId,
+    startDate: start_at,
+    endDate: end_at,
+    groupByUnit,
+    groupByValue,
+    url,
+    ref,
+    timezone: tz,
+  });
+  return ok(res, data);
+};
+
+async function getAnalyticsData({
+  token,
+  publicationId,
+  startDate,
+  endDate,
+  groupByUnit,
+  url,
+  ref,
+  timezone,
+}) {
+  try {
+    const from = new Date(parseInt(startDate)).toISOString();
+    const to = new Date(parseInt(endDate)).toISOString();
+    const granularity = getGroupBy(groupByUnit);
+    const filter = {
+      time: {
+        absolute: {
+          from,
+          to,
+        },
+      },
+    };
+    if (url) {
+      filter.paths = [url];
+    }
+    if (ref) {
+      filter.referrerHosts = [ref];
+    }
+    const variables = {
+      id: publicationId,
+      first: 100,
+      filter,
+      groupBy: {
+        granularity,
+      },
+      options: {
+        groupingTimezone: timezone,
+      },
+      visitorsFilter: filter,
+      visitorsGroupBy: {
+        granularity,
+      },
+      visitorsOptions: {
+        groupingTimezone: timezone,
+      },
+    };
+
+    const response = await fetch(getGQLUrl(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token,
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    });
+    if (!response.ok) {
+      console.error('HTTP-Error:', response.status);
+      throw new Error('HTTP-Error');
+    }
+    const responseBody = await response.json();
+    if (responseBody.errors) {
+      console.error('Response contained errors:', responseBody.errors);
+      throw new Error('Response contained errors');
+    }
+    return mapData(responseBody.data, timezone);
+  } catch (error) {
+    console.log('error', error);
+  }
+}
+
+function getGroupBy(unit) {
+  switch (unit) {
+    case 'hour':
+      return 'HOURLY';
+    case 'day':
+      return 'DAILY';
+    case 'week':
+      return 'WEEKLY';
+    case 'month':
+      return 'MONTHLY';
+    case 'year':
+      return 'YEARLY';
+    default:
+      return 'DAILY';
+  }
+}
+
+const query = /* GraphQL */ `
+  query Pageviews(
+    $id: ObjectId
+    $first: Int!
+    $filter: PublicationViewsFilter
+    $visitorsFilter: PublicationVisitorsFilter
+    $groupBy: PublicationViewsGroupBy
+    $visitorsGroupBy: PublicationVisitorsGroupBy
+    $options: PublicationViewsOptions
+    $visitorsOptions: PublicationVisitorsOptions
+  ) {
+    publication(id: $id) {
+      url
+      analytics {
+        views(first: $first, filter: $filter, groupBy: $groupBy, options: $options) {
+          edges {
+            node {
+              id
+              total
+              ... on GroupedByTimeViews {
+                id
+                total
+                from
+                to
+              }
+            }
+          }
+        }
+        visitors(
+          first: $first
+          filter: $visitorsFilter
+          groupBy: $visitorsGroupBy
+          options: $visitorsOptions
+        ) {
+          edges {
+            node {
+              id
+              total
+              ... on GroupedByTimeVisitors {
+                id
+                total
+                from
+                to
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const mapData = (data, timezone) => {
+  const pageviews = data?.publication?.analytics?.views?.edges.map(item => ({
+    // dates are in UTC, if omitting timezone information we have to transform them to the desired timezone first
+    t: format(utcToZonedTime(new Date(item.node.to), timezone), 'yyyy-MM-dd HH:mm:ss'),
+    y: item.node.total,
+  }));
+  const sessions = data?.publication?.analytics?.visitors?.edges.map(item => ({
+    t: format(utcToZonedTime(new Date(item.node.to), timezone), 'yyyy-MM-dd HH:mm:ss'),
+    y: item.node.total,
+  }));
+  return {
+    pageviews,
+    sessions,
+  };
+};

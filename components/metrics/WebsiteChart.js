@@ -2,52 +2,47 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import PageviewsChart from './PageviewsChart';
 import MetricsBar from './MetricsBar';
-//import WebsiteHeader from './WebsiteHeader';
 import DateFilter from 'components/common/DateFilter';
 import StickyHeader from 'components/helpers/StickyHeader';
 import useFetch from 'hooks/useFetch';
 import useDateRange from 'hooks/useDateRange';
-import useTimezone from 'hooks/useTimezone';
 import usePageQuery from 'hooks/usePageQuery';
-import { getDateArray, getDateLength } from 'lib/date';
 import ErrorMessage from 'components/common/ErrorMessage';
 import FilterTags from 'components/metrics/FilterTags';
-import useShareToken from 'hooks/useShareToken';
-import { TOKEN_HEADER } from 'lib/constants';
+import { getDateArray, getDateLength } from 'lib/date';
 import styles from './WebsiteChart.module.css';
+import useTimezone from 'hooks/useTimezone';
 
 export default function WebsiteChart({
-  websiteId,
+  publicationId,
   //title,
-  //domain,
   stickyHeader = false,
   //showLink = false,
   hideChart = false,
   onDataLoad = () => {},
 }) {
-  const shareToken = useShareToken();
-  const [dateRange, setDateRange] = useDateRange(websiteId);
+  const [dateRange, setDateRange] = useDateRange(publicationId);
   const { startDate, endDate, unit, value, modified } = dateRange;
-  const [timezone] = useTimezone();
   const {
     router,
     resolve,
     query: { url, ref },
   } = usePageQuery();
+  const [timezone] = useTimezone();
 
   const { data, loading, error } = useFetch(
-    `/api/website/${websiteId}/pageviews`,
+    `/api/gql/${publicationId}/pageviews`,
     {
       params: {
         start_at: +startDate,
         end_at: +endDate,
-        unit,
-        tz: timezone,
         url,
         ref,
+        groupByUnit: unit,
+        groupByValue: value,
+        tz: timezone,
       },
       onDataLoad,
-      headers: { [TOKEN_HEADER]: shareToken?.token },
     },
     [modified, url, ref],
   );
@@ -68,7 +63,6 @@ export default function WebsiteChart({
 
   return (
     <div className={styles.container}>
-      {/* <WebsiteHeader websiteId={websiteId} title={title} domain={domain} showLink={showLink} /> */}
       <div className={classNames(styles.header, 'row')}>
         <StickyHeader
           className={classNames(styles.metrics, 'col row')}
@@ -77,7 +71,7 @@ export default function WebsiteChart({
         >
           <FilterTags params={{ url, ref }} onClick={handleCloseFilter} />
           <div className="col-12 col-lg-9">
-            <MetricsBar websiteId={websiteId} />
+            <MetricsBar publicationId={publicationId} />
           </div>
           <div className={classNames(styles.filter, 'col-12 col-lg-3')}>
             <DateFilter
@@ -94,7 +88,7 @@ export default function WebsiteChart({
           {error && <ErrorMessage />}
           {!hideChart && (
             <PageviewsChart
-              websiteId={websiteId}
+              publicationId={publicationId}
               data={chartData}
               unit={unit}
               records={getDateLength(startDate, endDate, unit)}

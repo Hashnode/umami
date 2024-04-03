@@ -50,11 +50,12 @@ export default function BlogLogo(props) {
     return null;
   }
   const isThemeDark = theme === 'dark';
-  const useDarkLogo = publication.darkModeLogo && isThemeDark;
-  const useLogo = useDarkLogo || publication.logo;
-
+  const useDarkLogo = publication.preferences?.darkMode?.logo && isThemeDark;
+  const useLogo = useDarkLogo || publication.preferences?.logo;
   if (useLogo) {
-    const logoSrc = useDarkLogo ? publication.darkModeLogo : publication.logo;
+    const logoSrc = useDarkLogo
+      ? publication.preferences.darkMode.logo
+      : publication.preferences.logo;
     return <CustomLogo publication={publication} logoSrc={logoSrc} />;
   }
   return <DefaultLogo publication={publication} />;

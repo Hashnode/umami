@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import useCountryNames from 'hooks/useCountryNames';
 import useLocale from 'hooks/useLocale';
 
-export default function CountriesTable({ websiteId, onDataLoad, ...props }) {
+export default function CountriesTable({ publicationId, onDataLoad, ...props }) {
   const { locale } = useLocale();
   const countryNames = useCountryNames(locale);
 
@@ -23,7 +23,7 @@ export default function CountriesTable({ websiteId, onDataLoad, ...props }) {
       title={<FormattedMessage id="metrics.countries" defaultMessage="Countries" />}
       type="country"
       metric={<FormattedMessage id="metrics.visitors" defaultMessage="Visitors" />}
-      websiteId={websiteId}
+      publicationId={publicationId}
       onDataLoad={data => onDataLoad?.(percentFilter(data))}
       renderLabel={renderLabel}
     />

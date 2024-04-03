@@ -5,8 +5,8 @@ import WebsiteChart from 'components/metrics/WebsiteChart';
 import WorldMap from 'components/common/WorldMap';
 import Page from 'components/layout/Page';
 import GridLayout, { GridRow, GridColumn } from 'components/layout/GridLayout';
-import MenuLayout from 'components/layout/MenuLayout';
 import Link from 'components/common/Link';
+import MenuLayout from 'components/layout/MenuLayout';
 import Loading from 'components/common/Loading';
 import Arrow from 'assets/arrow-right.svg';
 import styles from './WebsiteDetails.module.css';
@@ -16,12 +16,8 @@ import BrowsersTable from '../metrics/BrowsersTable';
 import OSTable from '../metrics/OSTable';
 import DevicesTable from '../metrics/DevicesTable';
 import CountriesTable from '../metrics/CountriesTable';
-import EventsTable from '../metrics/EventsTable';
-import EventsChart from '../metrics/EventsChart';
-import useFetch from 'hooks/useFetch';
 import usePageQuery from 'hooks/usePageQuery';
-import useShareToken from 'hooks/useShareToken';
-import { DEFAULT_ANIMATION_DURATION, TOKEN_HEADER } from 'lib/constants';
+import { DEFAULT_ANIMATION_DURATION } from 'lib/constants';
 
 const views = {
   url: PagesTable,
@@ -30,17 +26,15 @@ const views = {
   os: OSTable,
   device: DevicesTable,
   country: CountriesTable,
-  event: EventsTable,
 };
 
-export default function WebsiteDetails({ websiteId }) {
-  const shareToken = useShareToken();
-  const { data } = useFetch(`/api/website/${websiteId}`, {
-    headers: { [TOKEN_HEADER]: shareToken?.token },
-  });
+export default function WebsiteDetails({ publication }) {
+  return <MainContent publication={publication} />;
+}
+
+function MainContent({ publication }) {
   const [chartLoaded, setChartLoaded] = useState(false);
   const [countryData, setCountryData] = useState();
-  const [eventsData, setEventsData] = useState();
   const {
     resolve,
     query: { view },
@@ -82,16 +76,13 @@ export default function WebsiteDetails({ websiteId }) {
       label: <FormattedMessage id="metrics.countries" defaultMessage="Countries" />,
       value: resolve({ view: 'country' }),
     },
-    {
-      label: <FormattedMessage id="metrics.events" defaultMessage="Events" />,
-      value: resolve({ view: 'event' }),
-    },
   ];
 
   const tableProps = {
-    websiteId,
-    websiteDomain: data?.domain,
+    publicationId: publication.id,
+    websiteDomain: publication.url,
     limit: 10,
+    virtualize: false,
   };
 
   const DetailsComponent = views[view];
@@ -102,18 +93,13 @@ export default function WebsiteDetails({ websiteId }) {
     }
   }
 
-  if (!data) {
-    return null;
-  }
-
   return (
     <Page>
       <div className="row">
         <div className={classNames(styles.chart, 'col')}>
           <WebsiteChart
-            websiteId={websiteId}
-            title={data.name}
-            domain={data.domain}
+            publicationId={publication.id}
+            title={publication.title}
             onDataLoad={handleDataLoad}
             showLink={false}
             stickyHeader
@@ -150,14 +136,6 @@ export default function WebsiteDetails({ websiteId }) {
               <CountriesTable {...tableProps} onDataLoad={setCountryData} />
             </GridColumn>
           </GridRow>
-          <GridRow className={classNames({ [styles.hidden]: !eventsData?.length > 0 })}>
-            <GridColumn xs={12} md={12} lg={4}>
-              <EventsTable {...tableProps} onDataLoad={setEventsData} />
-            </GridColumn>
-            <GridColumn xs={12} md={12} lg={8}>
-              <EventsChart className={styles.eventschart} websiteId={websiteId} />
-            </GridColumn>
-          </GridRow>
         </GridLayout>
       )}
       {view && chartLoaded && (
@@ -170,8 +148,8 @@ export default function WebsiteDetails({ websiteId }) {
           <DetailsComponent
             {...tableProps}
             height={500}
-            limit={false}
-            animte={false}
+            limit={25}
+            animate={false}
             showFilters
             virtualize
           />
