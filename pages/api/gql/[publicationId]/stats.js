@@ -30,8 +30,8 @@ async function getAnalyticsData({
   ref,
 }) {
   try {
-    const from = new Date(parseInt(startDate)),
-      to = new Date(parseInt(endDate));
+    const from = new Date(parseInt(startDate));
+    const to = new Date(parseInt(endDate));
     const differenceKeyValuePair = getDifferenceKeyValuePair(groupByValue, from, to);
     const pastFrom = sub(from, differenceKeyValuePair);
     const pastTo = from;
@@ -122,10 +122,10 @@ function getDifferenceKeyValuePair(unit, from, to) {
       };
     case 'custom':
       return {
-        days: differenceInDays(from, to),
+        days: Math.abs(differenceInDays(from, to)),
       };
     default:
-      return differenceInMinutes(from, to);
+      return Math.abs(differenceInMinutes(from, to));
   }
 }
 
