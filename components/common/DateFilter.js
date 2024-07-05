@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { endOfYear, isSameDay } from 'date-fns';
+import { isSameDay } from 'date-fns';
 import Modal from './Modal';
 import DropDown from './DropDown';
 import DatePickerForm from 'components/forms/DatePickerForm';
@@ -91,7 +91,8 @@ function DateFilter({ value, startDate, endDate, onChange, className }) {
             startDate={startDate}
             endDate={endDate}
             minDate={new Date(2015, 0, 1)}
-            maxDate={endOfYear(new Date())}
+            // can't predict the future
+            maxDate={new Date()}
             onChange={handlePickerChange}
             onClose={() => setShowPicker(false)}
           />
