@@ -58,7 +58,7 @@ export default function WebsiteChart({
   );
 
   const chartData = useMemo(() => {
-    if (data) {
+    if (data?.pageviews && data?.sessions) {
       return {
         pageviews: getDateArray(data.pageviews, startDate, endDate, unit),
         sessions: getDateArray(data.sessions, startDate, endDate, unit),
